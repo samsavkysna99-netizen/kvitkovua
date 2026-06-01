@@ -43,7 +43,7 @@ button,a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 }
 .bg-slide.on{opacity:1}
 .bg-overlay{
-  position:absolute;inset:0;
+  position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(
     180deg,
     rgba(15,8,2,.35) 0%,
@@ -453,7 +453,8 @@ footer{background:var(--text);color:rgba(255,255,255,.75);padding:5rem 4rem 2rem
 /* ════════════════════════════════
    DRAWERS / AUTH (same structure)
 ════════════════════════════════ */
-.overlay{position:fixed;inset:0;background:rgba(20,10,5,.45);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
+.overlay{position:fixed;inset:0;background:rgba(20,10,5,.45);z-index:200;opacity:0;pointer-events:none!important;visibility:hidden;transition:opacity .3s,visibility .3s}
+.overlay.open{opacity:1;pointer-events:all!important;visibility:visible;backdrop-filter:blur(4px)}
 .overlay.open{opacity:1;pointer-events:all}
 .drawer{
   position:fixed;top:0;right:0;bottom:0;width:430px;
@@ -495,7 +496,7 @@ footer{background:var(--text);color:rgba(255,255,255,.75);padding:5rem 4rem 2rem
 .btn-ghost:hover{background:var(--primary-pale)}
 
 /* Auth modal */
-.modal-bg{position:fixed;inset:0;background:rgba(20,10,5,.55);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.modal-bg{position:fixed;inset:0;background:rgba(20,10,5,.55);z-index:300;display:none;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:var(--white);border:1.5px solid var(--border);border-radius:22px;width:420px;max-width:95vw;overflow:hidden;box-shadow:0 20px 80px rgba(100,60,30,.25);animation:modalIn .35s ease}
 @keyframes modalIn{from{opacity:0;transform:scale(.92) translateY(20px)}to{opacity:1;transform:none}}
@@ -684,8 +685,8 @@ footer{background:var(--text);color:rgba(255,255,255,.75);padding:5rem 4rem 2rem
     <li><a href="#contacts">Контакти</a></li>
   </ul>
   <div class="nav-actions" id="navActions">
-    <button class="nav-btn nav-btn-outline" id="loginBtn">👤 Увійти</button>
-    <button class="nav-btn nav-btn-fill" id="openCart">🛒 Кошик <span class="cart-count" id="cartCount">0</span></button>
+    <button class="nav-btn nav-btn-outline" id="loginBtn" onclick="openModal()">👤 Увійти</button>
+    <button class="nav-btn nav-btn-fill" id="openCart" onclick="openCartDrawer()">🛒 Кошик <span class="cart-count" id="cartCount">0</span></button>
   </div>
 </nav>
 
@@ -1175,7 +1176,11 @@ function applyFilter(cat,btn){
 function addToCart(id){const p=PRODUCTS.find(x=>x.id===id);const ex=cart.find(x=>x.id===id);if(ex)ex.qty++;else cart.push({...p,qty:1});saveCart();updateCartUI();showToast(`🌸 "${p.name}" додано до кошика`)}
 function changeQty(id,d){const it=cart.find(x=>x.id===id);if(!it)return;it.qty+=d;if(it.qty<=0)cart=cart.filter(x=>x.id!==id);saveCart();updateCartUI()}
 function removeFromCart(id){cart=cart.filter(x=>x.id!==id);saveCart();updateCartUI()}
-function updateCartUI(){document.getElementById('cartCount').textContent=cart.reduce((s,i)=>s+i.qty,0);renderCartItems()}
+function updateCartUI(){
+  const cc = document.getElementById('cartCount');
+  if(cc) cc.textContent = cart.reduce((s,i)=>s+i.qty, 0);
+  renderCartItems();
+}
 function renderCartItems(){
   const wrap=document.getElementById('cartItems'),empty=document.getElementById('cartEmpty'),foot=document.getElementById('cartFoot');
   wrap.querySelectorAll('.cart-item').forEach(e=>e.remove());
@@ -1280,14 +1285,16 @@ function doRegister(){
 }
 function doLogout(){user=null;saveUser();closeAcc();updateNavAuth();showToast('До побачення! 🌿')}
 function updateNavAuth(){
-  const a=document.getElementById('navActions');
-  if(user){
-    a.innerHTML=`<button class="nav-btn nav-btn-outline" onclick="openAcc()">🌿 ${user.name}</button><button class="nav-btn nav-btn-fill" id="openCart">🛒 Кошик <span class="cart-count" id="cartCount">0</span></button>`;
-  }else{
-    a.innerHTML=`<button class="nav-btn nav-btn-outline" id="loginBtn">👤 Увійти</button><button class="nav-btn nav-btn-fill" id="openCart">🛒 Кошик <span class="cart-count" id="cartCount">0</span></button>`;
-    document.getElementById('loginBtn').onclick=openModal;
+  const loginBtn = document.getElementById('loginBtn');
+  if(loginBtn){
+    if(user){
+      loginBtn.textContent = '🌿 ' + user.name;
+      loginBtn.onclick = openAcc;
+    } else {
+      loginBtn.textContent = '👤 Увійти';
+      loginBtn.onclick = openModal;
+    }
   }
-  document.getElementById('openCart').onclick=openCartDrawer;
   updateCartUI();
 }
 
