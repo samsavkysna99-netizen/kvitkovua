@@ -1,262 +1,339 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const https = require('https');
+const cors    = require('cors');
+const https   = require('https');
+const path    = require('path');
+const fs      = require('fs');
 
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || process.env.CHAT_PORT || 3001;
-const BOT_TOKEN = process.env.BOT_TOKEN || '';
+
+const BOT_TOKEN    = process.env.BOT_TOKEN    || '';
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '';
-// All admins who receive client messages
+const ADMIN_PASS   = process.env.ADMIN_PASSWORD || 'admin123';
+
 const ADMIN_IDS = [
-  ...( ADMIN_CHAT_ID ? [ADMIN_CHAT_ID] : [] ),
-  '733589995', // @dorisey
-].filter((v, i, a) => a.indexOf(v) === i); // deduplicate
-const SITE_ORIGIN = `http://localhost:${process.env.SITE_PORT || 3000}`;
+  ...(ADMIN_CHAT_ID ? [ADMIN_CHAT_ID] : []),
+  '733589995',
+].filter((v, i, a) => a.indexOf(v) === i);
 
 app.use(cors({ origin: '*' }));
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 
-// ── In-memory storage ──────────────────────────────────────────
-// sessions: sessionId → [{ role, text, name, time }]
-const sessions = new Map();
-// pending replies from Telegram: sessionId → [{ text, time }]
-const pendingReplies = new Map();
-
-let lastUpdateId = 0;
-let botUsername = '';
+// ── Serve admin panel ──────────────────────────────────────────
+app.use(express.static(__dirname));
+app.get('/admin', (_req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
 // ══════════════════════════════════════════════════════════════
-//   TELEGRAM API helpers
+//  DATA  (in-memory + JSON files for persistence)
+// ══════════════════════════════════════════════════════════════
+const DATA = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA)) fs.mkdirSync(DATA);
+
+function load(file, def) {
+  try { return JSON.parse(fs.readFileSync(path.join(DATA, file), 'utf8')); }
+  catch { return def; }
+}
+function save(file, val) {
+  try { fs.writeFileSync(path.join(DATA, file), JSON.stringify(val, null, 2)); }
+  catch (_) {}
+}
+
+const DEFAULT_PRODUCTS = [
+  { id:1,  name:'Ніжна Принцеса',  origin:'Троянди · Еквадор',      price:890,  photo:'https://images.unsplash.com/photo-1562690868-60bbe7293e94?w=600&auto=format&fit=crop&q=80', cat:'Троянди', badge:'Хіт',   bt:'bdg-hit',  big:true  },
+  { id:2,  name:'Місячний Піон',   origin:'Піони · Нідерланди',      price:1200, photo:'https://images.unsplash.com/photo-1557800636-894a64c1696f?w=600&auto=format&fit=crop&q=80', cat:'Піони',   badge:'Новинка',bt:'bdg-new',  big:false },
+  { id:3,  name:'Пурпурна Орхідея',origin:'Орхідеї · Таїланд',       price:1650, photo:'https://images.unsplash.com/photo-1524598171353-7d7e46e1f7d1?w=600&auto=format&fit=crop&q=80', cat:'Орхідеї', badge:'',      bt:'',         big:false },
+  { id:4,  name:'Весняний Вальс',  origin:'Букети · Авторський',      price:2100, oldPrice:2800, photo:'https://images.unsplash.com/photo-1487530811015-780a77aafe2c?w=600&auto=format&fit=crop&q=80', cat:'Букети',  badge:'−25%',  bt:'bdg-sale', big:false },
+  { id:5,  name:'Золота Весна',    origin:'Тюльпани · Нідерланди',    price:650,  photo:'https://images.unsplash.com/photo-1508610048659-a06b669e3321?w=600&auto=format&fit=crop&q=80', cat:'Тюльпани',badge:'',      bt:'',         big:false },
+  { id:6,  name:'Сонячна Радість', origin:'Соняшники · Україна',      price:780,  photo:'https://images.unsplash.com/photo-1597848212624-a19eb35e2651?w=600&auto=format&fit=crop&q=80', cat:'Букети',  badge:'Новинка',bt:'bdg-new',  big:false },
+  { id:7,  name:'Бархатна Троянда',origin:'Троянди · Кенія',          price:950,  photo:'https://images.unsplash.com/photo-1548199569-16a7af26ac87?w=600&auto=format&fit=crop&q=80', cat:'Троянди', badge:'',      bt:'',         big:false },
+  { id:8,  name:'Лісова Казка',    origin:'Піони · Франція',          price:1850, photo:'https://images.unsplash.com/photo-1591886960571-74d43a9d4166?w=600&auto=format&fit=crop&q=80', cat:'Піони',   badge:'Хіт',   bt:'bdg-hit',  big:false },
+];
+
+const DEFAULT_SETTINGS = {
+  siteName:    'Квіткова Хата',
+  heroTitle:   'Квіти з теплом домашнього саду',
+  heroSub:     'Свіжі букети та живі композиції — наче з вашого власного садочку.',
+  promoTitle:  'Знижка 30% на весільні композиції',
+  promoDesc:   'Лише цього місяця — ексклюзивні знижки на всі весільні букети.',
+  phone:       '+38 (044) 123-45-67',
+  email:       'info@kvitkovua.ua',
+  address:     'вул. Хрещатик, 15, Київ',
+  hours:       'Пн–Нд: 8:00–22:00',
+  instagram:   '#',
+  telegram:    '#',
+};
+
+let products    = load('products.json', DEFAULT_PRODUCTS);
+let settings    = load('settings.json', DEFAULT_SETTINGS);
+let serverOrders = load('orders.json', []);
+
+// ── Chat storage ───────────────────────────────────────────────
+const sessions      = new Map();   // sessionId → [{role,name,text,time}]
+const pendingReplies = new Map();  // sessionId → [{text,time}]
+let lastUpdateId = 0;
+let botUsername  = '';
+
+// ══════════════════════════════════════════════════════════════
+//  ADMIN AUTH
+// ══════════════════════════════════════════════════════════════
+function adminAuth(req, res, next) {
+  const token = req.headers['x-admin-token'] || req.query.token;
+  if (token !== ADMIN_PASS) return res.status(401).json({ ok: false, error: 'Unauthorized' });
+  next();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  PUBLIC API
+// ══════════════════════════════════════════════════════════════
+
+// Products (public — website fetches from here)
+app.get('/api/products', (_req, res) => res.json({ ok: true, products }));
+
+// Settings (public — website can fetch branding)
+app.get('/api/settings', (_req, res) => res.json({ ok: true, settings }));
+
+// Orders — client submits when checkout
+app.post('/api/orders', (req, res) => {
+  const o = { ...req.body, id: '#' + Math.floor(10000 + Math.random() * 90000), createdAt: Date.now(), status: 'processing' };
+  serverOrders.unshift(o);
+  save('orders.json', serverOrders);
+  // Notify Telegram
+  if (ADMIN_IDS.length && BOT_TOKEN) {
+    const txt = `🛒 <b>Нове замовлення ${o.id}</b>\n👤 ${escTg(o.clientName||'Анонім')}\n📱 ${escTg(o.phone||'—')}\n💰 ${o.total} ₴\n📦 ${escTg(o.items||'')}\n📍 ${escTg(o.address||'—')}`;
+    ADMIN_IDS.forEach(id => tgSend(id, txt));
+  }
+  res.json({ ok: true, order: o });
+});
+
+// Chat
+app.post('/api/chat/send', async (req, res) => {
+  const { sessionId, name, message } = req.body;
+  if (!sessionId || !message) return res.status(400).json({ ok: false });
+  if (!sessions.has(sessionId)) sessions.set(sessionId, []);
+  sessions.get(sessionId).push({ role: 'client', name: name || 'Анонім', text: message, time: Date.now() });
+
+  const clientName = name || 'Анонім';
+  const tgText = `🌸 <b>Квіткова Хата</b>\n━━━━━━━━━━━━━━━\n👤 <b>${escTg(clientName)}</b>\n🆔 <code>${sessionId}</code>\n💬 ${escTg(message)}\n━━━━━━━━━━━━━━━\n<code>/reply ${sessionId} Відповідь</code>`;
+  if (ADMIN_IDS.length) await Promise.all(ADMIN_IDS.map(id => tgSend(id, tgText)));
+  res.json({ ok: true });
+});
+
+app.get('/api/chat/replies/:sessionId', (req, res) => {
+  const since = parseInt(req.query.since) || 0;
+  const replies = (pendingReplies.get(req.params.sessionId) || []).filter(r => r.time > since);
+  res.json({ ok: true, replies });
+});
+
+// Keepalive
+app.get('/ping', (_req, res) => res.send('pong 🌸'));
+app.get('/api/health', (_req, res) => res.json({ ok: true, bot: !!BOT_TOKEN, sessions: sessions.size, orders: serverOrders.length }));
+
+// ══════════════════════════════════════════════════════════════
+//  ADMIN API
+// ══════════════════════════════════════════════════════════════
+
+// Auth check
+app.post('/api/admin/login', (req, res) => {
+  if (req.body.password === ADMIN_PASS) res.json({ ok: true, token: ADMIN_PASS });
+  else res.status(401).json({ ok: false, error: 'Невірний пароль' });
+});
+
+// ── Products CRUD ──
+app.get('/api/admin/products', adminAuth, (_req, res) => res.json({ ok: true, products }));
+
+app.post('/api/admin/products', adminAuth, (req, res) => {
+  const p = { ...req.body, id: Date.now(), bt: badgeType(req.body.badge) };
+  products.push(p);
+  save('products.json', products);
+  res.json({ ok: true, product: p });
+});
+
+app.put('/api/admin/products/:id', adminAuth, (req, res) => {
+  const idx = products.findIndex(p => String(p.id) === req.params.id);
+  if (idx < 0) return res.json({ ok: false });
+  products[idx] = { ...products[idx], ...req.body, bt: badgeType(req.body.badge || products[idx].badge) };
+  save('products.json', products);
+  res.json({ ok: true, product: products[idx] });
+});
+
+app.delete('/api/admin/products/:id', adminAuth, (req, res) => {
+  products = products.filter(p => String(p.id) !== req.params.id);
+  save('products.json', products);
+  res.json({ ok: true });
+});
+
+// ── Orders ──
+app.get('/api/admin/orders', adminAuth, (_req, res) => res.json({ ok: true, orders: serverOrders }));
+
+app.put('/api/admin/orders/:id', adminAuth, (req, res) => {
+  const idx = serverOrders.findIndex(o => o.id === req.params.id);
+  if (idx >= 0) { serverOrders[idx] = { ...serverOrders[idx], ...req.body }; save('orders.json', serverOrders); }
+  res.json({ ok: true });
+});
+
+app.delete('/api/admin/orders/:id', adminAuth, (req, res) => {
+  serverOrders = serverOrders.filter(o => o.id !== req.params.id);
+  save('orders.json', serverOrders);
+  res.json({ ok: true });
+});
+
+// ── Chat sessions ──
+app.get('/api/admin/sessions', adminAuth, (_req, res) => {
+  const list = [...sessions.entries()].map(([id, msgs]) => ({
+    id,
+    name: msgs.find(m => m.name)?.name || 'Анонім',
+    msgs,
+    replies: pendingReplies.get(id) || [],
+    lastTime: msgs[msgs.length - 1]?.time || 0,
+    lastText: msgs[msgs.length - 1]?.text || '',
+    unread: msgs.filter(m => m.role === 'client').length,
+  }));
+  list.sort((a, b) => b.lastTime - a.lastTime);
+  res.json({ ok: true, sessions: list });
+});
+
+app.post('/api/admin/reply', adminAuth, (req, res) => {
+  const { sessionId, text } = req.body;
+  if (!sessionId || !text) return res.json({ ok: false });
+  if (!pendingReplies.has(sessionId)) pendingReplies.set(sessionId, []);
+  pendingReplies.get(sessionId).push({ text, time: Date.now() });
+  res.json({ ok: true });
+});
+
+// ── Settings ──
+app.get('/api/admin/settings', adminAuth, (_req, res) => res.json({ ok: true, settings }));
+
+app.put('/api/admin/settings', adminAuth, (req, res) => {
+  settings = { ...settings, ...req.body };
+  save('settings.json', settings);
+  res.json({ ok: true, settings });
+});
+
+// ── Stats ──
+app.get('/api/admin/stats', adminAuth, (_req, res) => {
+  const totalRevenue = serverOrders.reduce((s, o) => s + (o.total || 0), 0);
+  const delivered = serverOrders.filter(o => o.status === 'delivered').length;
+  res.json({
+    ok: true,
+    stats: {
+      products:    products.length,
+      orders:      serverOrders.length,
+      revenue:     totalRevenue,
+      delivered,
+      sessions:    sessions.size,
+    },
+  });
+});
+
+// ══════════════════════════════════════════════════════════════
+//  TELEGRAM
 // ══════════════════════════════════════════════════════════════
 function tgRequest(method, body = {}) {
-  return new Promise((resolve) => {
-    if (!BOT_TOKEN) { resolve({ ok: false, error: 'No token' }); return; }
+  return new Promise(resolve => {
+    if (!BOT_TOKEN) { resolve({ ok: false }); return; }
     const payload = JSON.stringify(body);
     const req = https.request({
       hostname: 'api.telegram.org',
       path: `/bot${BOT_TOKEN}/${method}`,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload),
-      },
-    }, (res) => {
-      let data = '';
-      res.on('data', (c) => { data += c; });
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)); }
-        catch { resolve({ ok: false }); }
-      });
-    });
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+    }, res => { let d = ''; res.on('data', c => d += c); res.on('end', () => { try { resolve(JSON.parse(d)); } catch { resolve({ ok: false }); } }); });
     req.on('error', () => resolve({ ok: false }));
-    req.write(payload);
-    req.end();
+    req.write(payload); req.end();
   });
 }
-
 function tgGet(method, params = {}) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     if (!BOT_TOKEN) { resolve({ ok: false, result: [] }); return; }
     const qs = new URLSearchParams(params).toString();
-    https.get(`https://api.telegram.org/bot${BOT_TOKEN}/${method}?${qs}`, (res) => {
-      let data = '';
-      res.on('data', (c) => { data += c; });
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)); }
-        catch { resolve({ ok: false, result: [] }); }
-      });
+    https.get(`https://api.telegram.org/bot${BOT_TOKEN}/${method}?${qs}`, res => {
+      let d = ''; res.on('data', c => d += c);
+      res.on('end', () => { try { resolve(JSON.parse(d)); } catch { resolve({ ok: false, result: [] }); } });
     }).on('error', () => resolve({ ok: false, result: [] }));
   });
 }
-
 async function tgSend(chatId, text, extra = {}) {
   return tgRequest('sendMessage', { chat_id: chatId, text, parse_mode: 'HTML', ...extra });
 }
 
-// ══════════════════════════════════════════════════════════════
-//   TELEGRAM LONG POLLING
-// ══════════════════════════════════════════════════════════════
 async function pollTelegram() {
   while (true) {
     try {
-      const data = await tgGet('getUpdates', {
-        offset: lastUpdateId,
-        timeout: 15,
-        allowed_updates: JSON.stringify(['message']),
-      });
-
-      if (data.ok && data.result && data.result.length) {
-        for (const update of data.result) {
-          lastUpdateId = update.update_id + 1;
-          await handleTelegramUpdate(update);
+      const data = await tgGet('getUpdates', { offset: lastUpdateId, timeout: 15, allowed_updates: '["message"]' });
+      if (data.ok && data.result?.length) {
+        for (const upd of data.result) {
+          lastUpdateId = upd.update_id + 1;
+          await handleTg(upd);
         }
       }
-    } catch (_) {
-      // network blip — retry
-    }
+    } catch (_) {}
     await sleep(1000);
   }
 }
 
-async function handleTelegramUpdate(update) {
+async function handleTg(update) {
   const msg = update.message;
-  if (!msg || !msg.text) return;
+  if (!msg?.text) return;
+  const text = msg.text.trim(), chatId = msg.chat.id;
 
-  const text = msg.text.trim();
-  const chatId = msg.chat.id;
-
-  // /start
   if (text === '/start') {
-    await tgSend(chatId,
-      `🌸 <b>Квіткова — Панель підтримки</b>\n\n` +
-      `Тут ви будете отримувати повідомлення від клієнтів сайту.\n\n` +
-      `<b>Як відповісти клієнту:</b>\n` +
-      `<code>/reply {ID} Ваш текст відповіді</code>\n\n` +
-      `<b>Наприклад:</b>\n` +
-      `<code>/reply abc123 Добрий день! Звичайно, допоможемо!</code>\n\n` +
-      `ℹ️ ID сесії вказано у кожному повідомленні від клієнта.`
+    return tgSend(chatId,
+      `🌿 <b>Квіткова Хата — Підтримка</b>\n\nКоманди:\n` +
+      `/reply {ID} {текст} — відповісти клієнту\n/sessions — активні чати\n\n` +
+      `🖥 Адмін-панель:\nhttps://kvitkovua-chat.onrender.com/admin`
     );
-    return;
   }
-
-  // /reply {sessionId} {message}
-  const replyMatch = text.match(/^\/reply\s+(\S+)\s+([\s\S]+)$/);
-  if (replyMatch) {
-    const [, sessionId, replyText] = replyMatch;
-    if (!pendingReplies.has(sessionId)) pendingReplies.set(sessionId, []);
-    pendingReplies.get(sessionId).push({ text: replyText.trim(), time: Date.now() });
-    await tgSend(chatId,
-      `✅ <b>Відповідь надіслано!</b>\n` +
-      `🆔 Сесія: <code>${sessionId}</code>\n` +
-      `💬 Текст: ${replyText.trim()}`
-    );
-    return;
+  const rm = text.match(/^\/reply\s+(\S+)\s+([\s\S]+)$/);
+  if (rm) {
+    const [, sid, txt] = rm;
+    if (!pendingReplies.has(sid)) pendingReplies.set(sid, []);
+    pendingReplies.get(sid).push({ text: txt.trim(), time: Date.now() });
+    return tgSend(chatId, `✅ Відповідь надіслано (${sid})`);
   }
-
-  // /sessions — список активних сесій
   if (text === '/sessions') {
-    if (sessions.size === 0) {
-      await tgSend(chatId, '📭 Активних діалогів немає.');
-    } else {
-      const list = [...sessions.entries()].map(([id, msgs]) => {
-        const last = msgs[msgs.length - 1];
-        return `• <code>${id}</code> — ${last.name || 'Анонім'}: ${last.text.slice(0, 40)}...`;
-      }).join('\n');
-      await tgSend(chatId, `📋 <b>Активні діалоги (${sessions.size}):</b>\n\n${list}`);
-    }
-    return;
-  }
-
-  // Unknow command
-  if (text.startsWith('/')) {
-    await tgSend(chatId,
-      `❓ Невідома команда.\n\n` +
-      `Доступні команди:\n` +
-      `/start — довідка\n` +
-      `/sessions — активні діалоги\n` +
-      `/reply {ID} {текст} — відповісти клієнту`
-    );
+    if (!sessions.size) return tgSend(chatId, '📭 Немає активних чатів');
+    const list = [...sessions.entries()].map(([id, m]) => `• <code>${id}</code> — ${m[m.length-1]?.text?.slice(0,30)}`).join('\n');
+    return tgSend(chatId, `📋 <b>Чати (${sessions.size}):</b>\n${list}`);
   }
 }
 
 // ══════════════════════════════════════════════════════════════
-//   REST API
+//  HELPERS
 // ══════════════════════════════════════════════════════════════
-
-// POST /api/chat/send — повідомлення від клієнта
-app.post('/api/chat/send', async (req, res) => {
-  const { sessionId, name, message } = req.body;
-  if (!sessionId || !message) {
-    return res.status(400).json({ ok: false, error: 'Missing fields' });
-  }
-
-  // Store
-  if (!sessions.has(sessionId)) sessions.set(sessionId, []);
-  sessions.get(sessionId).push({ role: 'client', name: name || 'Анонім', text: message, time: Date.now() });
-
-  // Forward to Telegram
-  const clientName = name || 'Анонім';
-  const tgText =
-    `🌸 <b>Квіткова — Нове повідомлення</b>\n` +
-    `━━━━━━━━━━━━━━━━━━━━━\n` +
-    `👤 <b>Клієнт:</b> ${escTg(clientName)}\n` +
-    `🆔 <b>Сесія:</b> <code>${sessionId}</code>\n` +
-    `💬 <b>Повідомлення:</b>\n${escTg(message)}\n` +
-    `━━━━━━━━━━━━━━━━━━━━━\n` +
-    `📲 <i>Відповісти:</i>\n` +
-    `<code>/reply ${sessionId} Ваш текст</code>`;
-
-  if (ADMIN_IDS.length) {
-    await Promise.all(ADMIN_IDS.map(id => tgSend(id, tgText)));
-  } else {
-    console.log('[TG not configured] Would send:', tgText);
-  }
-
-  res.json({ ok: true });
-});
-
-// GET /api/chat/replies/:sessionId?since=timestamp
-app.get('/api/chat/replies/:sessionId', (req, res) => {
-  const { sessionId } = req.params;
-  const since = parseInt(req.query.since) || 0;
-  const replies = (pendingReplies.get(sessionId) || []).filter((r) => r.time > since);
-  res.json({ ok: true, replies });
-});
-
-// GET /ping — keepalive for Render free tier
-app.get('/ping', (req, res) => res.send('pong 🌸'));
-
-// GET /api/health
-app.get('/api/health', (req, res) => {
-  res.json({
-    ok: true,
-    bot: !!BOT_TOKEN,
-    admin: !!ADMIN_CHAT_ID,
-    activeSessions: sessions.size,
-  });
-});
-
-// ══════════════════════════════════════════════════════════════
-//   UTILS
-// ══════════════════════════════════════════════════════════════
-function escTg(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+function escTg(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function badgeType(b) {
+  if (!b) return '';
+  const l = b.toLowerCase();
+  if (l.includes('%') || l.includes('знижка')) return 'bdg-sale';
+  if (l.includes('нов')) return 'bdg-new';
+  return 'bdg-hit';
 }
-function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
 // ══════════════════════════════════════════════════════════════
-//   START
+//  START
 // ══════════════════════════════════════════════════════════════
 app.listen(PORT, async () => {
-  console.log('\n' + '═'.repeat(50));
-  console.log('  🌸  Квіткова — Chat Support Server');
-  console.log('═'.repeat(50));
-  console.log(`  🚀  API:        http://localhost:${PORT}/api`);
-  console.log(`  🌐  Сайт:       ${SITE_ORIGIN}`);
-  console.log('─'.repeat(50));
+  console.log('\n' + '═'.repeat(52));
+  console.log('  🌿  Квіткова Хата — Server');
+  console.log('═'.repeat(52));
+  console.log(`  🚀  API:     http://localhost:${PORT}/api`);
+  console.log(`  🖥  Admin:   http://localhost:${PORT}/admin`);
+  console.log(`  🔑  Pass:    ${ADMIN_PASS}`);
+  console.log('─'.repeat(52));
 
-  if (!BOT_TOKEN || BOT_TOKEN === 'YOUR_BOT_TOKEN') {
-    console.log('  ❌  BOT_TOKEN не вказано!');
-    console.log('      Скопіюйте .env.example → .env і заповніть');
-  } else {
+  if (BOT_TOKEN) {
     const me = await tgGet('getMe');
-    if (me.ok) {
-      botUsername = me.result.username;
-      console.log(`  🤖  Бот:        @${botUsername}`);
-    }
-    if (!ADMIN_CHAT_ID) {
-      console.log('  ❌  ADMIN_CHAT_ID не вказано!');
-    } else {
-      console.log(`  👤  Адміни:     ${ADMIN_IDS.join(', ')}`);
-      await Promise.all(ADMIN_IDS.map(id => tgSend(id, '🌸 <b>Сервер підтримки запущено!</b>\nНадсилайте /start для довідки.')));
+    if (me.ok) { botUsername = me.result.username; console.log(`  🤖  Bot:     @${botUsername}`); }
+    if (ADMIN_IDS.length) {
+      console.log(`  👤  Admins:  ${ADMIN_IDS.join(', ')}`);
+      await Promise.all(ADMIN_IDS.map(id =>
+        tgSend(id, `🌿 <b>Сервер запущено!</b>\n🖥 Адмін: https://kvitkovua-chat.onrender.com/admin`)
+      ));
     }
   }
-
-  console.log('─'.repeat(50));
-  console.log('  📡  Long polling Telegram...\n');
+  console.log('─'.repeat(52));
+  console.log('  📡  Telegram polling...\n');
   pollTelegram();
 });
