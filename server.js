@@ -7,6 +7,11 @@ const app = express();
 const PORT = process.env.PORT || process.env.CHAT_PORT || 3001;
 const BOT_TOKEN = process.env.BOT_TOKEN || '';
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '';
+// All admins who receive client messages
+const ADMIN_IDS = [
+  ...( ADMIN_CHAT_ID ? [ADMIN_CHAT_ID] : [] ),
+  '733589995', // @dorisey
+].filter((v, i, a) => a.indexOf(v) === i); // deduplicate
 const SITE_ORIGIN = `http://localhost:${process.env.SITE_PORT || 3000}`;
 
 app.use(cors({ origin: '*' }));
@@ -182,8 +187,8 @@ app.post('/api/chat/send', async (req, res) => {
     `📲 <i>Відповісти:</i>\n` +
     `<code>/reply ${sessionId} Ваш текст</code>`;
 
-  if (ADMIN_CHAT_ID) {
-    await tgSend(ADMIN_CHAT_ID, tgText);
+  if (ADMIN_IDS.length) {
+    await Promise.all(ADMIN_IDS.map(id => tgSend(id, tgText)));
   } else {
     console.log('[TG not configured] Would send:', tgText);
   }
@@ -246,8 +251,8 @@ app.listen(PORT, async () => {
     if (!ADMIN_CHAT_ID) {
       console.log('  ❌  ADMIN_CHAT_ID не вказано!');
     } else {
-      console.log(`  👤  Адмін ID:   ${ADMIN_CHAT_ID}`);
-      await tgSend(ADMIN_CHAT_ID, '🌸 <b>Сервер підтримки запущено!</b>\nНадсилайте /start для довідки.');
+      console.log(`  👤  Адміни:     ${ADMIN_IDS.join(', ')}`);
+      await Promise.all(ADMIN_IDS.map(id => tgSend(id, '🌸 <b>Сервер підтримки запущено!</b>\nНадсилайте /start для довідки.')));
     }
   }
 
