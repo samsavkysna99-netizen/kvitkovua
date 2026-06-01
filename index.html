@@ -28,6 +28,8 @@
 }
 html{scroll-behavior:smooth}
 body{background:#1a1008;color:var(--text);font-family:'Inter',sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
+@media(hover:none),(pointer:coarse){body{cursor:auto!important}#cur,#cur-r{display:none!important}}
+button,a,.cat-card,.prod-card,.add-btn,.btn-pink,.btn-ghost,.btn-hero-main,.btn-hero-sec,.f-btn,.nav-btn,.ic-btn,.add-card{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* ── Custom cursor ── */
 #cur{position:fixed;width:10px;height:10px;background:var(--primary);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s;mix-blend-mode:normal}
@@ -636,8 +638,12 @@ footer{background:var(--text);color:rgba(255,255,255,.75);padding:5rem 4rem 2rem
 @media(max-width:768px){
   nav{padding:1rem 1.2rem}
   .nav-links{display:none}
-  .hero-glass{padding:2.5rem 1.8rem}
+  .hero-glass{padding:2rem 1.3rem}
   section.white{padding:3.5rem 1.2rem}
+  .btn-pink,.btn-ghost,.btn-hero-main,.btn-hero-sec,.add-btn,.nav-btn{min-height:46px}
+  .prod-grid{gap:1rem}
+  .prod-foot{flex-direction:column;gap:.6rem;align-items:flex-start}
+  .add-btn{width:100%;justify-content:center}
   .stats-row{grid-template-columns:repeat(2,1fr)}
   .stat{border-right:none;border-bottom:1px solid var(--border)}
   .feats{grid-template-columns:1fr 1fr}
@@ -1035,6 +1041,53 @@ footer{background:var(--text);color:rgba(255,255,255,.75);padding:5rem 4rem 2rem
 <!-- ════════ TOAST ════════ -->
 <div class="toast" id="toast"></div>
 
+<!-- ════ CHECKOUT MODAL ════ -->
+<style>
+.co-overlay{position:fixed;inset:0;background:rgba(20,10,5,.55);z-index:300;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);padding:0}
+@media(min-width:600px){.co-overlay{align-items:center;padding:1rem}}
+.co-overlay.open{display:flex}
+.co-box{background:var(--white);width:100%;max-width:520px;border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.2);animation:coSlide .3s ease;display:flex;flex-direction:column}
+@media(min-width:600px){.co-box{border-radius:20px;animation:coIn .25s ease}}
+@keyframes coSlide{from{transform:translateY(100%)}to{transform:none}}
+@keyframes coIn{from{opacity:0;transform:translateY(20px)scale(.96)}to{opacity:1;transform:none}}
+.co-head{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:2;flex-shrink:0}
+.co-head h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400}
+.co-body{padding:1.3rem 1.5rem;overflow-y:auto}
+.co-body h4{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--primary);margin-bottom:.8rem;font-weight:500}
+.co-field{margin-bottom:.9rem}
+.co-field label{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+.co-field input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:.72rem 1rem;font-size:.9rem;font-family:inherit;outline:none;transition:border-color .25s;background:var(--bg2);color:var(--text);min-height:46px;-webkit-appearance:none}
+.co-field input:focus{border-color:var(--primary)}
+.co-foot{padding:1.2rem 1.5rem;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--white);flex-shrink:0}
+.co-total-row{display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif;font-size:1.25rem;margin-bottom:1rem}
+.co-total-row span:last-child{color:var(--primary);font-weight:400}
+.co-submit{width:100%;background:var(--primary);color:#fff;border:none;padding:.9rem;border-radius:50px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .25s;touch-action:manipulation;min-height:50px}
+.co-submit:hover,.co-submit:active{background:var(--primary-h)}
+.co-submit:disabled{background:var(--muted2);cursor:not-allowed}
+.co-close{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:8px;touch-action:manipulation}
+.co-close:hover{color:var(--text)}
+</style>
+<div class="co-overlay" id="coModal">
+  <div class="co-box">
+    <div class="co-head">
+      <h3>🛒 Оформлення замовлення</h3>
+      <button class="co-close" onclick="closeCheckout()">✕</button>
+    </div>
+    <div class="co-body">
+      <h4>Ваші товари</h4>
+      <div id="coItems" style="margin-bottom:1.2rem"></div>
+      <h4>Контактні дані</h4>
+      <div class="co-field"><label>Ім'я *</label><input id="co-name" placeholder="Ваше ім'я" autocomplete="name"/></div>
+      <div class="co-field"><label>Телефон *</label><input id="co-phone" type="tel" placeholder="+38 (___) ___-__-__" autocomplete="tel"/></div>
+      <div class="co-field"><label>Адреса доставки</label><input id="co-address" placeholder="вул. Хрещатик, 1, кв. 5" autocomplete="street-address"/></div>
+    </div>
+    <div class="co-foot">
+      <div class="co-total-row"><span>До сплати:</span><span id="coTotal">0 ₴</span></div>
+      <button class="co-submit" id="coSubmitBtn" onclick="submitOrder()">Підтвердити замовлення →</button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════ CHAT WIDGET ════════ -->
 <div class="cw" id="chatWidget">
   <div class="cw-panel" id="cwPanel">
@@ -1150,10 +1203,45 @@ function renderCartItems(){
   document.getElementById('cartTot').textContent=cart.reduce((s,i)=>s+i.price*i.qty,0).toLocaleString('uk-UA')+' ₴';
 }
 function checkout(){
-  if(!user){closeCart();showToast('🌸 Увійдіть щоб оформити замовлення');setTimeout(()=>openModal(),600);return}
-  const sum=cart.reduce((s,i)=>s+i.price*i.qty,0);
-  orders.unshift({id:'#'+Math.floor(10000+Math.random()*90000),date:new Date().toLocaleDateString('uk-UA'),items:cart.map(i=>`${i.name} ×${i.qty}`).join(', '),total:sum,status:'processing'});
-  saveOrders();cart=[];saveCart();updateCartUI();closeCart();showToast('🎉 Замовлення оформлено! Ми зателефонуємо.');
+  closeCart();
+  openCheckout();
+}
+function openCheckout(){
+  document.getElementById('coModal').classList.add('open');
+  if(user){
+    document.getElementById('co-name').value=user.name||'';
+    document.getElementById('co-phone').value=user.phone||'';
+  }
+  renderCoItems();
+}
+function closeCheckout(){document.getElementById('coModal').classList.remove('open')}
+function renderCoItems(){
+  const el=document.getElementById('coItems');
+  el.innerHTML=cart.map(i=>`<div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.82rem"><span>${i.name} ×${i.qty}</span><span style="color:var(--primary);font-weight:500">${(i.price*i.qty).toLocaleString('uk-UA')} ₴</span></div>`).join('');
+  document.getElementById('coTotal').textContent=cart.reduce((s,i)=>s+i.price*i.qty,0).toLocaleString('uk-UA')+' ₴';
+}
+async function submitOrder(){
+  const name=document.getElementById('co-name').value.trim();
+  const phone=document.getElementById('co-phone').value.trim();
+  const address=document.getElementById('co-address').value.trim();
+  if(!name){showToast('Введіть ваше ім\'я');document.getElementById('co-name').focus();return}
+  if(!phone){showToast('Введіть номер телефону');document.getElementById('co-phone').focus();return}
+  const items=cart.map(i=>`${i.name} ×${i.qty}`).join(', ');
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const btn=document.getElementById('coSubmitBtn');
+  btn.disabled=true;btn.textContent='⏳ Оформлення…';
+  try{
+    await fetch('https://kvitkovua-chat.onrender.com/api/orders',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({clientName:name,phone,address,items,total,date:new Date().toLocaleDateString('uk-UA')})
+    });
+  }catch(_){}
+  const localOrder={id:'#'+Math.floor(10000+Math.random()*90000),date:new Date().toLocaleDateString('uk-UA'),items,total,status:'processing'};
+  orders.unshift(localOrder);saveOrders();
+  cart=[];saveCart();updateCartUI();
+  btn.disabled=false;btn.textContent='Підтвердити замовлення →';
+  closeCheckout();
+  showToast('🎉 Замовлення оформлено! Ми зателефонуємо.');
 }
 
 /* Favorites */
@@ -1252,6 +1340,7 @@ document.querySelectorAll('a,button,.cat-card,.prod-card,.gal-item').forEach(el=
 
 /* Overlays */
 document.getElementById('authModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+document.getElementById('coModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCheckout()});
 document.getElementById('cartOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCart()});
 document.getElementById('accOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAcc()});
 document.getElementById('closeCart').onclick=closeCart;

@@ -2,242 +2,257 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>Квіткова Хата — Адмін</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@600&display=swap" rel="stylesheet"/>
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#f5f0eb;
-  --white:#fff;
-  --sidebar:#2d1f14;
-  --sidebar-hover:rgba(255,255,255,.07);
-  --sidebar-active:#b5614a;
-  --primary:#b5614a;
-  --primary-h:#9a4f3a;
-  --primary-pale:rgba(181,97,74,.1);
-  --sage:#7a9e7e;
-  --amber:#c9956a;
-  --text:#2d1f14;
-  --muted:rgba(45,31,20,.5);
-  --border:#e8ddd4;
-  --shadow:0 2px 16px rgba(100,60,30,.1);
-  --shadow-lg:0 8px 40px rgba(100,60,30,.15);
-  --red:#e05050;
-  --green:#4caf9e;
-  --yellow:#f0a830;
+  --bg:#f5f0eb;--white:#fff;--sidebar:#2d1f14;
+  --primary:#b5614a;--primary-h:#9a4f3a;--primary-pale:rgba(181,97,74,.1);
+  --sage:#7a9e7e;--amber:#c9956a;
+  --text:#2d1f14;--muted:rgba(45,31,20,.55);--muted2:rgba(45,31,20,.3);
+  --border:#e0d4c8;--shadow:0 2px 16px rgba(100,60,30,.1);--shadow-lg:0 8px 40px rgba(100,60,30,.18);
+  --red:#d63031;--green:#00b894;--yellow:#fdcb6e;
 }
-html,body{height:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);background:var(--bg)}
+html,body{height:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);background:var(--bg);overflow:hidden}
 
-/* ─── LOGIN ─── */
-#loginPage{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#2d1f14,#4a3020)}
-.login-card{background:#fff;border-radius:20px;padding:3rem;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.login-logo{font-family:'Dancing Script',cursive;font-size:2rem;color:var(--primary);text-align:center;margin-bottom:.3rem}
-.login-sub{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:2rem}
-.login-field{margin-bottom:1rem}
-.login-field label{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
-.login-field input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:.7rem 1rem;font-size:.9rem;font-family:inherit;outline:none;transition:border-color .2s}
-.login-field input:focus{border-color:var(--primary)}
-.login-btn{width:100%;background:var(--primary);color:#fff;border:none;padding:.8rem;border-radius:10px;font-size:.85rem;font-weight:500;cursor:pointer;transition:background .2s;margin-top:.5rem}
-.login-btn:hover{background:var(--primary-h)}
-.login-err{color:var(--red);font-size:.78rem;text-align:center;margin-top:.5rem;display:none}
-.login-err.on{display:block}
+/* ════ LOGIN ════ */
+#loginPage{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#2d1f14 0%,#5a3520 100%);overflow:auto;padding:1rem}
+.lc{background:#fff;border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.lc-logo{font-family:'Dancing Script',cursive;font-size:2rem;color:var(--primary);text-align:center;display:block;margin-bottom:.2rem}
+.lc-sub{text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:2rem}
+.lf label{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+.lf input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:.75rem 1rem;font-size:.95rem;font-family:inherit;outline:none;transition:border-color .2s;margin-bottom:.9rem}
+.lf input:focus{border-color:var(--primary)}
+.lf-btn{width:100%;background:var(--primary);color:#fff;border:none;padding:.85rem;border-radius:10px;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .2s;touch-action:manipulation}
+.lf-btn:hover,.lf-btn:active{background:var(--primary-h)}
+.lf-err{color:var(--red);font-size:.78rem;text-align:center;margin-top:.6rem;display:none}
+.lf-err.on{display:block}
 
-/* ─── LAYOUT ─── */
+/* ════ LAYOUT ════ */
 #app{display:none;height:100vh;overflow:hidden}
 #app.on{display:flex}
 
-/* ─── SIDEBAR ─── */
-.sidebar{
-  width:240px;flex-shrink:0;background:var(--sidebar);
-  display:flex;flex-direction:column;height:100vh;overflow-y:auto;
-}
-.sb-logo{padding:1.5rem 1.4rem;border-bottom:1px solid rgba(255,255,255,.08)}
-.sb-logo-txt{font-family:'Dancing Script',cursive;font-size:1.5rem;color:#fff;display:block}
-.sb-logo-sub{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.1rem}
-.sb-nav{padding:.8rem 0;flex:1}
-.sb-section{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:.6rem 1.4rem .3rem}
-.sb-link{
-  display:flex;align-items:center;gap:.7rem;
-  padding:.72rem 1.4rem;color:rgba(255,255,255,.65);
-  cursor:pointer;transition:all .2s;border:none;background:none;
-  width:100%;text-align:left;font-family:inherit;font-size:.84rem;
-  border-left:3px solid transparent;
-}
-.sb-link:hover{background:var(--sidebar-hover);color:#fff}
-.sb-link.active{background:rgba(181,97,74,.18);color:#fff;border-left-color:var(--sidebar-active)}
-.sb-link .ic{font-size:1rem;width:20px;text-align:center}
-.sb-link .badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:.1rem .45rem;border-radius:50px}
-.sb-bottom{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.08)}
-.sb-user{display:flex;align-items:center;gap:.7rem;color:rgba(255,255,255,.6);font-size:.78rem}
-.sb-av{width:34px;height:34px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+/* ════ SIDEBAR ════ */
+.sb{width:220px;flex-shrink:0;background:var(--sidebar);display:flex;flex-direction:column;height:100vh;overflow-y:auto;transition:transform .3s;z-index:50}
+.sb-logo{padding:1.3rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo span{font-family:'Dancing Script',cursive;font-size:1.45rem;color:#fff;display:block}
+.sb-logo small{font-size:.67rem;color:rgba(255,255,255,.35);margin-top:.1rem;display:block}
+.sb-nav{padding:.6rem 0;flex:1}
+.sb-sec{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);padding:.5rem 1.2rem .2rem}
+.sb-btn{display:flex;align-items:center;gap:.65rem;padding:.68rem 1.2rem;color:rgba(255,255,255,.6);cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:inherit;font-size:.83rem;border-left:3px solid transparent;min-height:44px;touch-action:manipulation}
+.sb-btn:hover,.sb-btn:active{background:rgba(255,255,255,.07);color:#fff}
+.sb-btn.active{background:rgba(181,97,74,.2);color:#fff;border-left-color:var(--primary)}
+.sb-btn .ic{font-size:.95rem;width:18px;text-align:center;flex-shrink:0}
+.sb-btn .nb{margin-left:auto;background:var(--red);color:#fff;font-size:.58rem;font-weight:700;padding:.1rem .42rem;border-radius:50px;min-width:18px;text-align:center}
+.sb-foot{padding:.9rem 1.2rem;border-top:1px solid rgba(255,255,255,.07)}
+.sb-user{display:flex;align-items:center;gap:.6rem;color:rgba(255,255,255,.5);font-size:.76rem}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
 
-/* ─── MAIN ─── */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{
-  background:#fff;border-bottom:1px solid var(--border);
-  padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;box-shadow:0 1px 8px rgba(100,60,30,.06);
-}
-.topbar-title{font-size:1rem;font-weight:600;color:var(--text)}
-.topbar-right{display:flex;align-items:center;gap:.8rem}
-.tb-badge{background:var(--primary-pale);color:var(--primary);font-size:.72rem;padding:.3rem .8rem;border-radius:50px;font-weight:500}
-.content{flex:1;overflow-y:auto;padding:2rem}
+/* ════ TOPBAR ════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 8px rgba(100,60,30,.06);gap:.8rem}
+.tb-left{display:flex;align-items:center;gap:.8rem}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:.4rem;color:var(--text);font-size:1.3rem;min-width:40px;min-height:40px;align-items:center;justify-content:center;touch-action:manipulation}
+.tb-title{font-size:.95rem;font-weight:600;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
+.tb-status{background:rgba(0,184,148,.12);color:var(--green);font-size:.7rem;padding:.28rem .75rem;border-radius:50px;font-weight:500;white-space:nowrap}
 
-/* ─── PAGES ─── */
+/* ════ CONTENT ════ */
+.content{flex:1;overflow-y:auto;padding:1.5rem;-webkit-overflow-scrolling:touch}
+
+/* ════ BTN ════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.52rem 1.1rem;border-radius:8px;font-size:.78rem;font-weight:500;cursor:pointer;font-family:inherit;border:none;transition:all .2s;min-height:38px;touch-action:manipulation;white-space:nowrap}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover,.btn-primary:active{background:var(--primary-h)}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
+.btn-ghost:hover,.btn-ghost:active{border-color:var(--primary);color:var(--primary)}
+.btn-danger{background:transparent;color:var(--red);border:1.5px solid rgba(214,48,49,.25)}
+.btn-danger:hover,.btn-danger:active{background:rgba(214,48,49,.08)}
+.btn-green{background:var(--green);color:#fff}
+.btn-sm{padding:.32rem .7rem;font-size:.72rem;min-height:32px}
+
+/* ════ PAGE ════ */
 .page{display:none}
 .page.on{display:block}
 
-/* ─── STATS CARDS ─── */
-.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-bottom:2rem}
-.stat-card{background:#fff;border-radius:14px;padding:1.4rem;box-shadow:var(--shadow);border-left:4px solid var(--primary)}
-.stat-card.green{border-left-color:var(--green)}
-.stat-card.amber{border-left-color:var(--amber)}
-.stat-card.sage{border-left-color:var(--sage)}
-.sc-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
-.sc-val{font-size:1.8rem;font-weight:600;color:var(--text);line-height:1}
-.sc-sub{font-size:.72rem;color:var(--muted);margin-top:.3rem}
-.sc-icon{font-size:1.6rem;float:right;opacity:.4}
+/* ════ STATS ════ */
+.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.sc{background:#fff;border-radius:12px;padding:1.2rem;box-shadow:var(--shadow);border-left:4px solid var(--primary);position:relative;overflow:hidden}
+.sc.g{border-left-color:var(--green)} .sc.a{border-left-color:var(--amber)} .sc.s{border-left-color:var(--sage)}
+.sc-ic{position:absolute;right:.8rem;top:.8rem;font-size:1.5rem;opacity:.3}
+.sc-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem}
+.sc-val{font-size:1.7rem;font-weight:700;color:var(--text);line-height:1}
+.sc-sub{font-size:.7rem;color:var(--muted);margin-top:.25rem}
 
-/* ─── SECTION HEADER ─── */
-.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem}
-.sec-hd h2{font-size:1rem;font-weight:600}
-.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;border-radius:8px;font-size:.78rem;font-weight:500;cursor:pointer;font-family:inherit;border:none;transition:all .2s}
-.btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary-h)}
-.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
-.btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
-.btn-danger{background:transparent;color:var(--red);border:1.5px solid rgba(224,80,80,.3)}
-.btn-danger:hover{background:rgba(224,80,80,.08)}
-.btn-sm{padding:.3rem .7rem;font-size:.72rem}
-.btn-green{background:var(--green);color:#fff}
+/* ════ SECTION HEADER ════ */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;gap:.8rem;flex-wrap:wrap}
+.sh h2{font-size:.95rem;font-weight:600}
 
-/* ─── TABLE ─── */
-.table-wrap{background:#fff;border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
-table{width:100%;border-collapse:collapse}
-th{background:var(--bg);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:.8rem 1rem;text-align:left;border-bottom:1px solid var(--border);font-weight:500}
-td{padding:.85rem 1rem;border-bottom:1px solid var(--border);font-size:.83rem;vertical-align:middle}
+/* ════ TABLE ════ */
+.tw{background:#fff;border-radius:12px;box-shadow:var(--shadow);overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th{background:var(--bg);font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:.7rem .9rem;text-align:left;border-bottom:1px solid var(--border);font-weight:500;white-space:nowrap}
+td{padding:.8rem .9rem;border-bottom:1px solid var(--border);font-size:.81rem;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(181,97,74,.03)}
-.td-actions{display:flex;gap:.4rem}
+tr:hover td{background:rgba(181,97,74,.025)}
+.td-act{display:flex;gap:.4rem;align-items:center}
 
-/* ─── BADGES ─── */
-.badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;font-weight:500;padding:.2rem .6rem;border-radius:50px;letter-spacing:.04em}
-.badge-processing{background:rgba(240,168,48,.15);color:#c88000}
-.badge-delivered{background:rgba(76,175,158,.15);color:var(--green)}
-.badge-cancelled{background:rgba(224,80,80,.12);color:var(--red)}
-.badge-new{background:rgba(122,158,126,.15);color:var(--sage)}
+/* ════ BADGE ════ */
+.badge{display:inline-flex;align-items:center;font-size:.67rem;font-weight:600;padding:.18rem .55rem;border-radius:50px}
+.b-proc{background:rgba(253,203,110,.2);color:#c78800}
+.b-deliv{background:rgba(0,184,148,.12);color:var(--green)}
+.b-canc{background:rgba(214,48,49,.1);color:var(--red)}
 
-/* ─── PRODUCT GRID ─── */
-.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2rem}
-.prod-adm-card{background:#fff;border-radius:14px;box-shadow:var(--shadow);overflow:hidden;transition:box-shadow .2s}
-.prod-adm-card:hover{box-shadow:var(--shadow-lg)}
-.pac-img{height:160px;overflow:hidden;position:relative}
-.pac-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
-.prod-adm-card:hover .pac-img img{transform:scale(1.05)}
-.pac-bdg{position:absolute;top:.6rem;left:.6rem;font-size:.62rem;font-weight:600;padding:.2rem .55rem;border-radius:50px;text-transform:uppercase}
-.pac-body{padding:1rem}
-.pac-name{font-weight:600;font-size:.88rem;margin-bottom:.2rem}
-.pac-cat{font-size:.72rem;color:var(--muted);margin-bottom:.6rem}
-.pac-price{font-size:1rem;font-weight:600;color:var(--primary)}
-.pac-actions{display:flex;gap:.5rem;margin-top:.8rem}
+/* ════ PRODUCT GRID ════ */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
+.pc{background:#fff;border-radius:12px;box-shadow:var(--shadow);overflow:hidden;transition:box-shadow .2s}
+.pc:hover{box-shadow:var(--shadow-lg)}
+.pc-img{height:150px;overflow:hidden;position:relative;background:var(--bg)}
+.pc-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s;display:block}
+.pc:hover .pc-img img{transform:scale(1.06)}
+.pc-bdg{position:absolute;top:.5rem;left:.5rem;font-size:.6rem;font-weight:700;padding:.18rem .5rem;border-radius:50px;text-transform:uppercase}
+.pc-body{padding:.9rem}
+.pc-name{font-weight:600;font-size:.85rem;margin-bottom:.15rem;line-height:1.3}
+.pc-cat{font-size:.7rem;color:var(--muted);margin-bottom:.5rem}
+.pc-price{font-size:.95rem;font-weight:700;color:var(--primary)}
+.pc-actions{display:flex;gap:.4rem;margin-top:.7rem}
+.pc-actions .btn{flex:1;font-size:.72rem}
+.add-card{background:rgba(181,97,74,.05);border:2px dashed rgba(181,97,74,.3);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;cursor:pointer;min-height:260px;transition:all .2s;color:var(--muted);touch-action:manipulation}
+.add-card:hover,.add-card:active{border-color:var(--primary);color:var(--primary);background:var(--primary-pale)}
+.add-card-plus{font-size:2.2rem;line-height:1;color:var(--primary)}
 
-/* ─── ADD PRODUCT CARD ─── */
-.add-prod-card{background:rgba(181,97,74,.05);border:2px dashed rgba(181,97,74,.3);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;cursor:pointer;height:280px;transition:all .2s;color:var(--muted)}
-.add-prod-card:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-pale)}
-.add-prod-card .plus{font-size:2rem;line-height:1}
+/* ════ FILTER BAR ════ */
+.fbar{display:flex;gap:.6rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.fbar input,.fbar select{border:1.5px solid var(--border);border-radius:8px;padding:.48rem .85rem;font-size:.8rem;font-family:inherit;outline:none;background:#fff;min-height:38px;transition:border-color .2s}
+.fbar input:focus,.fbar select:focus{border-color:var(--primary)}
+.fbar input{min-width:180px;flex:1}
 
-/* ─── MODAL ─── */
-.modal-bg{position:fixed;inset:0;background:rgba(20,10,5,.5);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:1rem}
-.modal-bg.on{display:flex}
-.modal{background:#fff;border-radius:18px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 80px rgba(0,0,0,.25);animation:mIn .3s ease}
+/* ════ MODAL ════ */
+.mbg{position:fixed;inset:0;background:rgba(20,10,5,.5);z-index:500;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);padding:0}
+.mbg.on{display:flex}
+@media(min-width:600px){.mbg{align-items:center;padding:1rem}}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.2);animation:mslide .3s ease;display:flex;flex-direction:column}
+@media(min-width:600px){.modal{border-radius:18px;animation:mIn .25s ease;max-height:88vh}}
+@keyframes mslide{from{transform:translateY(100%)}to{transform:translateY(0)}}
 @keyframes mIn{from{opacity:0;transform:translateY(20px)scale(.96)}to{opacity:1;transform:none}}
-.modal-hd{padding:1.3rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:2}
-.modal-hd h3{font-size:.95rem;font-weight:600}
-.modal-body{padding:1.5rem}
-.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.7rem;position:sticky;bottom:0;background:#fff}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.field{margin-bottom:1rem}
-.field label{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem;font-weight:500}
-.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:.65rem .9rem;font-size:.85rem;font-family:inherit;outline:none;transition:border-color .2s;background:#fff;color:var(--text)}
+.mhd{padding:1.1rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:2;flex-shrink:0}
+.mhd h3{font-size:.9rem;font-weight:600}
+.mbody{padding:1.2rem;overflow-y:auto}
+.mfooter{padding:.9rem 1.2rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.6rem;position:sticky;bottom:0;background:#fff;flex-shrink:0}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.field{margin-bottom:.9rem}
+.field label{display:block;font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.28rem;font-weight:500}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:.62rem .85rem;font-size:.85rem;font-family:inherit;outline:none;transition:border-color .2s;background:#fff;color:var(--text);min-height:42px}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary)}
-.field textarea{resize:vertical;min-height:80px}
-.field-note{font-size:.7rem;color:var(--muted);margin-top:.3rem}
-.photo-preview{width:100%;height:130px;border-radius:8px;object-fit:cover;margin-top:.5rem;display:none;border:1px solid var(--border)}
-.photo-preview.on{display:block}
-.x-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.2rem;line-height:1;padding:.2rem;transition:color .2s}
-.x-btn:hover{color:var(--text)}
+.field textarea{resize:vertical;min-height:72px}
+.fnote{font-size:.68rem;color:var(--muted);margin-top:.25rem;line-height:1.4}
+.x-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.2rem;padding:.3rem;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:all .2s;touch-action:manipulation}
+.x-btn:hover{color:var(--text);background:var(--bg)}
 
-/* ─── CHAT ─── */
-.chat-layout{display:grid;grid-template-columns:280px 1fr;gap:1.2rem;height:calc(100vh - 140px)}
-.chat-list{background:#fff;border-radius:14px;box-shadow:var(--shadow);overflow-y:auto}
-.chat-search{padding:.8rem;border-bottom:1px solid var(--border)}
-.chat-search input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:.5rem .8rem;font-size:.8rem;font-family:inherit;outline:none}
-.chat-search input:focus{border-color:var(--primary)}
-.chat-item{padding:.9rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
-.chat-item:hover{background:var(--bg)}
-.chat-item.active{background:var(--primary-pale);border-left:3px solid var(--primary)}
-.ci-name{font-weight:600;font-size:.83rem;margin-bottom:.2rem}
-.ci-preview{font-size:.76rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ci-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.2rem}
-.ci-time{font-size:.68rem;color:var(--muted2,rgba(45,31,20,.3))}
-.ci-cnt{background:var(--primary);color:#fff;font-size:.6rem;font-weight:700;padding:.1rem .4rem;border-radius:50px}
-.chat-main{background:#fff;border-radius:14px;box-shadow:var(--shadow);display:flex;flex-direction:column}
-.chat-hd{padding:1rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem}
-.chat-hd-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--primary));display:flex;align-items:center;justify-content:center;font-size:1.1rem}
-.chat-hd-name{font-weight:600;font-size:.88rem}
-.chat-hd-sid{font-size:.7rem;color:var(--muted);font-family:monospace}
-.chat-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem;background:#faf7f4}
-.cmsg{max-width:75%;display:flex;flex-direction:column}
-.cmsg-b{padding:.5rem .85rem;border-radius:12px;font-size:.82rem;line-height:1.5;word-break:break-word}
-.cmsg-t{font-size:.62rem;opacity:.55;margin-top:.18rem}
-.cmsg.client{align-self:flex-start}
-.cmsg.client .cmsg-b{background:#fff;border:1px solid var(--border);border-radius:12px 12px 12px 3px}
-.cmsg.admin{align-self:flex-end}
-.cmsg.admin .cmsg-b{background:var(--primary);color:#fff;border-radius:12px 12px 3px 12px}
-.cmsg.admin .cmsg-t{text-align:right;color:rgba(255,255,255,.6)}
-.chat-empty-state{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.88rem;flex-direction:column;gap:.5rem}
-.chat-input-area{padding:.8rem 1rem;border-top:1px solid var(--border);display:flex;gap:.6rem;align-items:flex-end}
-.chat-ta{flex:1;border:1.5px solid var(--border);border-radius:10px;padding:.6rem .9rem;font-size:.83rem;font-family:inherit;resize:none;outline:none;min-height:40px;max-height:120px;transition:border-color .2s}
+/* ════ PHOTO UPLOAD ════ */
+.photo-tabs{display:flex;background:var(--bg);border-radius:8px;padding:.2rem;margin-bottom:.8rem;gap:.2rem}
+.photo-tab{flex:1;padding:.45rem;border-radius:6px;font-size:.75rem;font-weight:500;border:none;background:transparent;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .2s;touch-action:manipulation;min-height:34px}
+.photo-tab.active{background:#fff;color:var(--primary);box-shadow:0 1px 4px rgba(100,60,30,.12)}
+.upload-zone{border:2px dashed rgba(181,97,74,.3);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;background:rgba(181,97,74,.03);touch-action:manipulation}
+.upload-zone:hover,.upload-zone:active,.upload-zone.drag{border-color:var(--primary);background:var(--primary-pale)}
+.uz-icon{font-size:2rem;margin-bottom:.4rem;display:block}
+.uz-text{font-size:.8rem;color:var(--muted)}
+.uz-text strong{color:var(--primary)}
+.photo-preview-wrap{position:relative;margin-top:.7rem;display:none}
+.photo-preview-wrap.on{display:block}
+.photo-preview-wrap img{width:100%;height:160px;object-fit:cover;border-radius:8px;display:block;border:1px solid var(--border)}
+.photo-clear{position:absolute;top:.4rem;right:.4rem;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.upload-progress{display:none;font-size:.75rem;color:var(--primary);margin-top:.4rem;text-align:center}
+.upload-progress.on{display:block}
+
+/* ════ CHAT ════ */
+.chat-layout{display:grid;grid-template-columns:260px 1fr;gap:1rem;height:calc(100vh - 130px)}
+.chat-sessions{background:#fff;border-radius:12px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.cs-search{padding:.7rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.cs-search input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:.48rem .8rem;font-size:.8rem;font-family:inherit;outline:none;min-height:38px}
+.cs-search input:focus{border-color:var(--primary)}
+.cs-list{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.cs-item{padding:.8rem .9rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;touch-action:manipulation}
+.cs-item:hover,.cs-item:active{background:var(--bg)}
+.cs-item.active{background:var(--primary-pale);border-left:3px solid var(--primary)}
+.cs-name{font-weight:600;font-size:.82rem;margin-bottom:.18rem}
+.cs-prev{font-size:.74rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.15rem}
+.cs-time{font-size:.67rem;color:var(--muted2)}
+.cs-cnt{background:var(--primary);color:#fff;font-size:.58rem;font-weight:700;padding:.08rem .38rem;border-radius:50px}
+.chat-window{background:#fff;border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+.cw-hd{padding:.85rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.65rem;flex-shrink:0}
+.cw-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--primary));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.cw-name{font-weight:600;font-size:.85rem}
+.cw-sid{font-size:.68rem;color:var(--muted);font-family:monospace}
+.chat-msgs{flex:1;overflow-y:auto;padding:.9rem;display:flex;flex-direction:column;gap:.5rem;background:#faf7f4;-webkit-overflow-scrolling:touch}
+.cmsg{max-width:78%;display:flex;flex-direction:column}
+.cmsg-b{padding:.48rem .8rem;border-radius:12px;font-size:.8rem;line-height:1.5;word-break:break-word}
+.cmsg-t{font-size:.6rem;opacity:.55;margin-top:.15rem}
+.cmsg.cl{align-self:flex-start}
+.cmsg.cl .cmsg-b{background:#fff;border:1px solid var(--border);border-radius:12px 12px 12px 3px}
+.cmsg.ad{align-self:flex-end}
+.cmsg.ad .cmsg-b{background:var(--primary);color:#fff;border-radius:12px 12px 3px 12px}
+.cmsg.ad .cmsg-t{text-align:right;color:rgba(255,255,255,.55)}
+.chat-ia{padding:.7rem .9rem;border-top:1px solid var(--border);display:flex;gap:.5rem;align-items:flex-end;flex-shrink:0}
+.chat-ta{flex:1;border:1.5px solid var(--border);border-radius:10px;padding:.55rem .8rem;font-size:.8rem;font-family:inherit;resize:none;outline:none;min-height:40px;max-height:110px;transition:border-color .2s;-webkit-appearance:none}
 .chat-ta:focus{border-color:var(--primary)}
-.chat-send-btn{background:var(--primary);color:#fff;border:none;width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:1rem;transition:background .2s;flex-shrink:0}
-.chat-send-btn:hover{background:var(--primary-h)}
+.chat-sb{background:var(--primary);color:#fff;border:none;width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;touch-action:manipulation}
+.chat-sb:hover,.chat-sb:active{background:var(--primary-h)}
 .no-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:.5rem}
-.no-chat .ic{font-size:3rem;opacity:.25}
+.no-chat-ic{font-size:2.5rem;opacity:.2}
 
-/* ─── SETTINGS ─── */
-.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.settings-card{background:#fff;border-radius:14px;padding:1.5rem;box-shadow:var(--shadow)}
-.settings-card h3{font-size:.88rem;font-weight:600;margin-bottom:1.2rem;padding-bottom:.7rem;border-bottom:1px solid var(--border);color:var(--primary)}
+/* ════ SETTINGS ════ */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.scard{background:#fff;border-radius:12px;padding:1.3rem;box-shadow:var(--shadow)}
+.scard h3{font-size:.82rem;font-weight:600;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--border);color:var(--primary);text-transform:uppercase;letter-spacing:.07em}
 
-/* ─── EMPTY ─── */
-.empty-state{text-align:center;padding:3rem;color:var(--muted)}
-.empty-state .ic{font-size:3rem;opacity:.25;display:block;margin-bottom:.8rem}
+/* ════ EMPTY ════ */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
+.empty .ic{font-size:2.5rem;opacity:.2;display:block;margin-bottom:.6rem}
 
-/* ─── TOAST ─── */
-.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--text);color:#fff;padding:.6rem 1.4rem;border-radius:8px;font-size:.8rem;z-index:9999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none}
+/* ════ CONFIRM ════ */
+.conf-modal .modal{max-width:360px;border-radius:18px}
+.conf-modal{align-items:center;padding:1rem}
+
+/* ════ TOAST ════ */
+.toast{position:fixed;bottom:1.2rem;right:1.2rem;padding:.6rem 1.3rem;border-radius:8px;font-size:.8rem;z-index:9999;opacity:0;transform:translateY(6px);transition:all .28s;pointer-events:none;font-weight:500;max-width:calc(100vw - 2.4rem);box-shadow:0 4px 20px rgba(0,0,0,.2)}
 .toast.on{opacity:1;transform:none}
-.toast.success{background:var(--green)}
-.toast.error{background:var(--red)}
+.toast.s{background:var(--green);color:#fff}
+.toast.e{background:var(--red);color:#fff}
+.toast.i{background:var(--text);color:#fff}
 
-/* ─── SEARCH + FILTER BAR ─── */
-.filter-bar{display:flex;gap:.7rem;margin-bottom:1.3rem;flex-wrap:wrap;align-items:center}
-.filter-bar input{border:1.5px solid var(--border);border-radius:8px;padding:.48rem .9rem;font-size:.8rem;font-family:inherit;outline:none;transition:border-color .2s;min-width:200px}
-.filter-bar input:focus{border-color:var(--primary)}
-.filter-bar select{border:1.5px solid var(--border);border-radius:8px;padding:.48rem .9rem;font-size:.8rem;font-family:inherit;outline:none;cursor:pointer;background:#fff}
+/* ════ OVERLAY (mobile sidebar) ════ */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:49;touch-action:manipulation}
+.sb-overlay.on{display:block}
 
-/* ─── RESPONSIVE ─── */
+/* ════ RESPONSIVE ════ */
 @media(max-width:900px){
-  .sidebar{width:60px}
-  .sb-logo,.sb-section,.sb-link span,.sb-user span,.sb-logo-sub{display:none}
-  .sb-link{padding:.72rem;justify-content:center}
   .stat-cards{grid-template-columns:repeat(2,1fr)}
-  .settings-grid{grid-template-columns:1fr}
-}
-@media(max-width:600px){
+  .sgrid{grid-template-columns:1fr}
   .chat-layout{grid-template-columns:1fr;height:auto}
-  .stat-cards{grid-template-columns:1fr 1fr}
-  .form-row{grid-template-columns:1fr}
+  .chat-sessions{max-height:280px}
+  .chat-window{min-height:400px}
+}
+@media(max-width:768px){
+  .sb{position:fixed;top:0;left:0;height:100%;transform:translateX(-100%);z-index:50}
+  .sb.open{transform:translateX(0)}
+  .main{width:100%}
+  .hamburger{display:inline-flex}
+  .stat-cards{grid-template-columns:1fr 1fr;gap:.7rem}
+  .pgrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .pc-img{height:130px}
+  .content{padding:1rem}
+  .topbar{padding:0 1rem}
+  .tb-status{display:none}
+  .frow{grid-template-columns:1fr}
+  td,th{padding:.65rem .7rem}
+}
+@media(max-width:400px){
+  .stat-cards{grid-template-columns:1fr}
+  .sc-val{font-size:1.4rem}
 }
 </style>
 </head>
@@ -245,134 +260,127 @@ tr:hover td{background:rgba(181,97,74,.03)}
 
 <!-- ════ LOGIN ════ -->
 <div id="loginPage">
-  <div class="login-card">
-    <div class="login-logo">🌿 Квіткова Хата</div>
-    <div class="login-sub">Адміністративна панель</div>
-    <div class="login-field">
+  <div class="lc">
+    <span class="lc-logo">🌿 Квіткова Хата</span>
+    <div class="lc-sub">Адміністративна панель</div>
+    <div class="lf">
       <label>Пароль</label>
-      <input type="password" id="loginPass" placeholder="Введіть пароль" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <input type="password" id="lp" placeholder="Введіть пароль" autocomplete="current-password"/>
+      <button class="lf-btn" onclick="doLogin()">Увійти →</button>
+      <div class="lf-err" id="lerr">Невірний пароль. Перевірте і спробуйте ще раз.</div>
     </div>
-    <div class="login-err" id="loginErr">Невірний пароль</div>
-    <button class="login-btn" onclick="doLogin()">Увійти →</button>
   </div>
 </div>
 
 <!-- ════ APP ════ -->
 <div id="app">
-  <!-- Sidebar -->
-  <aside class="sidebar">
+  <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+  <aside class="sb" id="sidebar">
     <div class="sb-logo">
-      <span class="sb-logo-txt">🌿 Квіткова</span>
-      <div class="sb-logo-sub">Адмін панель</div>
+      <span>🌿 Квіткова Хата</span>
+      <small>Адмін панель</small>
     </div>
     <nav class="sb-nav">
-      <div class="sb-section">Головне</div>
-      <button class="sb-link active" onclick="goTo('dashboard')"><span class="ic">📊</span><span>Дашборд</span></button>
-      <button class="sb-link" onclick="goTo('products')"><span class="ic">🌸</span><span>Товари</span></button>
-      <button class="sb-link" onclick="goTo('orders')"><span class="ic">📦</span><span>Замовлення</span><span class="badge" id="newOrdersBadge" style="display:none">0</span></button>
-      <div class="sb-section">Комунікація</div>
-      <button class="sb-link" onclick="goTo('chat')"><span class="ic">💬</span><span>Повідомлення</span><span class="badge" id="chatBadge" style="display:none">0</span></button>
-      <div class="sb-section">Система</div>
-      <button class="sb-link" onclick="goTo('settings')"><span class="ic">⚙️</span><span>Налаштування</span></button>
+      <div class="sb-sec">Головне</div>
+      <button class="sb-btn active" data-page="dashboard" onclick="go('dashboard')"><span class="ic">📊</span>Дашборд</button>
+      <button class="sb-btn" data-page="products"  onclick="go('products')"><span class="ic">🌸</span>Товари</button>
+      <button class="sb-btn" data-page="orders"    onclick="go('orders')"><span class="ic">📦</span>Замовлення<span class="nb" id="nbOrders" style="display:none">0</span></button>
+      <div class="sb-sec">Комунікація</div>
+      <button class="sb-btn" data-page="chat"      onclick="go('chat')"><span class="ic">💬</span>Повідомлення<span class="nb" id="nbChat" style="display:none">0</span></button>
+      <div class="sb-sec">Система</div>
+      <button class="sb-btn" data-page="settings"  onclick="go('settings')"><span class="ic">⚙️</span>Налаштування</button>
     </nav>
-    <div class="sb-bottom">
-      <div class="sb-user">
-        <div class="sb-av">👤</div>
-        <span>Адміністратор</span>
-      </div>
+    <div class="sb-foot">
+      <div class="sb-user"><div class="sb-av">👤</div><span>Адміністратор</span></div>
     </div>
   </aside>
 
-  <!-- Main -->
   <div class="main">
     <div class="topbar">
-      <span class="topbar-title" id="pageTitle">Дашборд</span>
-      <div class="topbar-right">
-        <span class="tb-badge" id="serverStatus">● Онлайн</span>
-        <a href="https://iridescent-yeot-350b7a.netlify.app" target="_blank" class="btn btn-ghost btn-sm">🌐 Відкрити сайт</a>
+      <div class="tb-left">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="tb-title" id="ptitle">Дашборд</span>
+      </div>
+      <div class="tb-right">
+        <span class="tb-status">● Онлайн</span>
+        <a href="https://iridescent-yeot-350b7a.netlify.app" target="_blank" class="btn btn-ghost btn-sm">🌐 Сайт</a>
         <button class="btn btn-ghost btn-sm" onclick="logout()">Вийти</button>
       </div>
     </div>
 
     <div class="content">
 
-      <!-- ══ DASHBOARD ══ -->
+      <!-- DASHBOARD -->
       <div class="page on" id="page-dashboard">
-        <div class="stat-cards" id="statCards">
-          <div class="stat-card"><span class="sc-icon">🌸</span><div class="sc-label">Товари</div><div class="sc-val" id="st-products">—</div><div class="sc-sub">в каталозі</div></div>
-          <div class="stat-card amber"><span class="sc-icon">📦</span><div class="sc-label">Замовлення</div><div class="sc-val" id="st-orders">—</div><div class="sc-sub">всього</div></div>
-          <div class="stat-card green"><span class="sc-icon">💰</span><div class="sc-label">Виручка</div><div class="sc-val" id="st-revenue">—</div><div class="sc-sub">загальна</div></div>
-          <div class="stat-card sage"><span class="sc-icon">💬</span><div class="sc-label">Чати</div><div class="sc-val" id="st-chats">—</div><div class="sc-sub">активних</div></div>
+        <div class="stat-cards">
+          <div class="sc"><span class="sc-ic">🌸</span><div class="sc-label">Товари</div><div class="sc-val" id="st-p">—</div><div class="sc-sub">в каталозі</div></div>
+          <div class="sc a"><span class="sc-ic">📦</span><div class="sc-label">Замовлення</div><div class="sc-val" id="st-o">—</div><div class="sc-sub">всього</div></div>
+          <div class="sc g"><span class="sc-ic">💰</span><div class="sc-label">Виручка</div><div class="sc-val" id="st-r">—</div><div class="sc-sub">загальна</div></div>
+          <div class="sc s"><span class="sc-ic">💬</span><div class="sc-label">Чати</div><div class="sc-val" id="st-c">—</div><div class="sc-sub">активних</div></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
           <div>
-            <div class="sec-hd"><h2>Останні замовлення</h2><button class="btn btn-ghost btn-sm" onclick="goTo('orders')">Всі →</button></div>
-            <div class="table-wrap" id="recentOrdersTable"><div class="empty-state"><span class="ic">📦</span>Замовлень поки немає</div></div>
+            <div class="sh"><h2>Останні замовлення</h2><button class="btn btn-ghost btn-sm" onclick="go('orders')">Всі →</button></div>
+            <div class="tw" id="dash-orders"><div class="empty"><span class="ic">📦</span>Замовлень поки немає</div></div>
           </div>
           <div>
-            <div class="sec-hd"><h2>Нові повідомлення</h2><button class="btn btn-ghost btn-sm" onclick="goTo('chat')">Відкрити →</button></div>
-            <div id="recentChats" class="table-wrap" style="padding:.5rem"><div class="empty-state"><span class="ic">💬</span>Повідомлень немає</div></div>
+            <div class="sh"><h2>Нові повідомлення</h2><button class="btn btn-ghost btn-sm" onclick="go('chat')">Відкрити →</button></div>
+            <div class="tw" id="dash-chats" style="padding:.5rem"><div class="empty"><span class="ic">💬</span>Немає</div></div>
           </div>
         </div>
       </div>
 
-      <!-- ══ PRODUCTS ══ -->
+      <!-- PRODUCTS -->
       <div class="page" id="page-products">
-        <div class="sec-hd">
-          <h2>Управління товарами</h2>
-          <button class="btn btn-primary" onclick="openAddProduct()">+ Додати товар</button>
-        </div>
-        <div class="filter-bar">
-          <input type="text" id="prodSearch" placeholder="🔍 Пошук за назвою…" oninput="renderProducts()"/>
-          <select id="prodCatFilter" onchange="renderProducts()">
+        <div class="sh"><h2>Товари</h2><button class="btn btn-primary" onclick="openAdd()">+ Додати товар</button></div>
+        <div class="fbar">
+          <input id="ps" placeholder="🔍 Пошук…" oninput="renderProds()"/>
+          <select id="pc" onchange="renderProds()">
             <option value="">Всі категорії</option>
             <option>Троянди</option><option>Піони</option><option>Орхідеї</option>
             <option>Букети</option><option>Тюльпани</option>
           </select>
         </div>
-        <div class="prod-grid" id="productsGrid"></div>
+        <div class="pgrid" id="prodsGrid"></div>
       </div>
 
-      <!-- ══ ORDERS ══ -->
+      <!-- ORDERS -->
       <div class="page" id="page-orders">
-        <div class="sec-hd">
+        <div class="sh">
           <h2>Замовлення</h2>
-          <div style="display:flex;gap:.7rem">
-            <select id="orderStatusFilter" onchange="renderOrders()" style="border:1.5px solid var(--border);border-radius:8px;padding:.45rem .8rem;font-size:.78rem;font-family:inherit;outline:none;cursor:pointer">
-              <option value="">Всі статуси</option>
-              <option value="processing">В обробці</option>
-              <option value="delivered">Доставлено</option>
-              <option value="cancelled">Скасовано</option>
-            </select>
-          </div>
+          <select id="osf" onchange="renderOrders()" style="border:1.5px solid var(--border);border-radius:8px;padding:.45rem .8rem;font-size:.78rem;font-family:inherit;outline:none;min-height:38px;cursor:pointer">
+            <option value="">Всі статуси</option>
+            <option value="processing">В обробці</option>
+            <option value="delivered">Доставлено</option>
+            <option value="cancelled">Скасовано</option>
+          </select>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Номер</th><th>Клієнт</th><th>Товари</th><th>Сума</th><th>Дата</th><th>Статус</th><th>Дії</th></tr></thead>
-            <tbody id="ordersBody"></tbody>
-          </table>
+        <div class="tw">
+          <table><thead><tr><th>Номер</th><th>Клієнт</th><th>Телефон</th><th>Сума</th><th>Дата</th><th>Статус</th><th>Дії</th></tr></thead>
+          <tbody id="otbody"></tbody></table>
         </div>
-        <div class="empty-state" id="ordersEmpty" style="display:none"><span class="ic">📦</span>Замовлень поки немає</div>
+        <div class="empty" id="oempty" style="display:none"><span class="ic">📦</span>Замовлень поки немає</div>
       </div>
 
-      <!-- ══ CHAT ══ -->
+      <!-- CHAT -->
       <div class="page" id="page-chat">
-        <div class="sec-hd"><h2>Повідомлення клієнтів</h2><button class="btn btn-ghost btn-sm" onclick="loadChats()">↻ Оновити</button></div>
+        <div class="sh"><h2>Повідомлення клієнтів</h2><button class="btn btn-ghost btn-sm" onclick="loadChats()">↻ Оновити</button></div>
         <div class="chat-layout">
-          <div class="chat-list">
-            <div class="chat-search"><input type="text" placeholder="🔍 Пошук…" id="chatSearch" oninput="filterChats()"/></div>
-            <div id="chatSessionList"></div>
+          <div class="chat-sessions">
+            <div class="cs-search"><input id="csq" placeholder="🔍 Пошук…" oninput="renderSessions()"/></div>
+            <div class="cs-list" id="csList"></div>
           </div>
-          <div class="chat-main" id="chatMain">
-            <div class="no-chat"><div class="ic">💬</div><span>Оберіть діалог зліва</span></div>
+          <div class="chat-window" id="chatWin">
+            <div class="no-chat"><div class="no-chat-ic">💬</div><span>Оберіть діалог</span></div>
           </div>
         </div>
       </div>
 
-      <!-- ══ SETTINGS ══ -->
+      <!-- SETTINGS -->
       <div class="page" id="page-settings">
-        <div class="sec-hd"><h2>Налаштування сайту</h2><button class="btn btn-primary" onclick="saveSettings()">💾 Зберегти все</button></div>
-        <div class="settings-grid" id="settingsGrid"></div>
+        <div class="sh"><h2>Налаштування сайту</h2><button class="btn btn-primary" onclick="saveSett()">💾 Зберегти</button></div>
+        <div class="sgrid" id="sgrid"></div>
       </div>
 
     </div>
@@ -380,56 +388,75 @@ tr:hover td{background:rgba(181,97,74,.03)}
 </div>
 
 <!-- ════ PRODUCT MODAL ════ -->
-<div class="modal-bg" id="productModal">
+<div class="mbg" id="pmModal">
   <div class="modal">
-    <div class="modal-hd">
-      <h3 id="productModalTitle">Додати товар</h3>
-      <button class="x-btn" onclick="closeProductModal()">✕</button>
-    </div>
-    <div class="modal-body">
+    <div class="mhd"><h3 id="pmTitle">Додати товар</h3><button class="x-btn" onclick="closePM()">✕</button></div>
+    <div class="mbody">
       <input type="hidden" id="pmId"/>
-      <div class="form-row">
-        <div class="field"><label>Назва товару *</label><input type="text" id="pmName" placeholder="Ніжна Принцеса"/></div>
+      <div class="frow">
+        <div class="field"><label>Назва *</label><input id="pmName" placeholder="Ніжна Принцеса"/></div>
         <div class="field"><label>Категорія *</label>
-          <select id="pmCat">
-            <option>Троянди</option><option>Піони</option><option>Орхідеї</option>
-            <option>Букети</option><option>Тюльпани</option>
-          </select>
+          <select id="pmCat"><option>Троянди</option><option>Піони</option><option>Орхідеї</option><option>Букети</option><option>Тюльпани</option></select>
         </div>
       </div>
-      <div class="field"><label>Походження / опис</label><input type="text" id="pmOrigin" placeholder="Троянди · Еквадор"/></div>
-      <div class="form-row">
+      <div class="field"><label>Походження / підпис</label><input id="pmOrig" placeholder="Троянди · Еквадор"/></div>
+      <div class="frow">
         <div class="field"><label>Ціна (₴) *</label><input type="number" id="pmPrice" placeholder="890" min="1"/></div>
-        <div class="field"><label>Стара ціна (₴)</label><input type="number" id="pmOldPrice" placeholder="залишити порожнім" min="0"/></div>
+        <div class="field"><label>Стара ціна (₴)</label><input type="number" id="pmOld" placeholder="залишити порожнім" min="0"/></div>
       </div>
-      <div class="form-row">
-        <div class="field"><label>Значок (бейдж)</label><input type="text" id="pmBadge" placeholder="Хіт / Новинка / −25%"/><div class="field-note">«Хіт» = помаранчевий · «Новинка» = зелений · «%» = червоний</div></div>
-        <div class="field"><label>Велика картка?</label>
-          <select id="pmBig"><option value="false">Звичайна</option><option value="true">Велика (2×2)</option></select>
+      <div class="frow">
+        <div class="field"><label>Значок</label><input id="pmBadge" placeholder="Хіт / Новинка / −25%"/>
+          <div class="fnote">Залиште порожнім — без значка</div>
+        </div>
+        <div class="field"><label>Розмір картки</label>
+          <select id="pmBig"><option value="false">Звичайна</option><option value="true">Велика (2×2, перша)</option></select>
         </div>
       </div>
+      <!-- Photo upload -->
       <div class="field">
-        <label>URL фотографії *</label>
-        <input type="url" id="pmPhoto" placeholder="https://images.unsplash.com/photo-..." oninput="previewPhoto()"/>
-        <div class="field-note">Рекомендуємо Unsplash: unsplash.com → скопіюйте посилання на фото</div>
-        <img id="pmPreview" class="photo-preview" alt="Прев'ю"/>
+        <label>Фотографія *</label>
+        <div class="photo-tabs">
+          <button type="button" class="photo-tab active" id="ptFile" onclick="setPhotoTab('file')">📁 Завантажити файл</button>
+          <button type="button" class="photo-tab" id="ptUrl" onclick="setPhotoTab('url')">🔗 URL посилання</button>
+        </div>
+        <!-- File upload zone -->
+        <div id="fileZone">
+          <div class="upload-zone" id="dropZone"
+            onclick="document.getElementById('fileInput').click()"
+            ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <span class="uz-icon">📷</span>
+            <div class="uz-text" id="uzText"><strong>Натисніть</strong> або перетягніть фото сюди<br><small style="color:var(--muted2)">JPG, PNG, WEBP до 10 МБ</small></div>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)"/>
+          <div class="upload-progress" id="upProgress">⏳ Обробка зображення…</div>
+        </div>
+        <!-- URL input -->
+        <div id="urlZone" style="display:none">
+          <input type="url" id="pmUrl" placeholder="https://images.unsplash.com/photo-…" oninput="onUrlInput()"/>
+          <div class="fnote">Unsplash: unsplash.com → знайдіть фото → копіюйте посилання</div>
+        </div>
+        <!-- Preview -->
+        <div class="photo-preview-wrap" id="pvWrap">
+          <img id="pvImg" src="" alt="Прев'ю"/>
+          <button type="button" class="photo-clear" onclick="clearPhoto()" title="Видалити фото">✕</button>
+        </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeProductModal()">Скасувати</button>
-      <button class="btn btn-primary" onclick="saveProduct()">💾 Зберегти</button>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="closePM()">Скасувати</button>
+      <button class="btn btn-primary" onclick="saveProduct()" id="pmSaveBtn">💾 Зберегти</button>
     </div>
   </div>
 </div>
 
-<!-- ════ CONFIRM MODAL ════ -->
-<div class="modal-bg" id="confirmModal">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-hd"><h3>Підтвердження</h3><button class="x-btn" onclick="closeConfirm()">✕</button></div>
-    <div class="modal-body"><p id="confirmText" style="font-size:.88rem;color:var(--muted);line-height:1.6"></p></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeConfirm()">Скасувати</button>
-      <button class="btn btn-danger" id="confirmOkBtn">Видалити</button>
+<!-- ════ CONFIRM ════ -->
+<div class="mbg conf-modal" id="confModal">
+  <div class="modal" style="border-radius:18px">
+    <div class="mhd"><h3>Підтвердження</h3><button class="x-btn" onclick="closeConf()">✕</button></div>
+    <div class="mbody"><p id="confText" style="font-size:.85rem;color:var(--muted);line-height:1.6"></p></div>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="closeConf()">Скасувати</button>
+      <button class="btn btn-danger" id="confOk">Видалити</button>
     </div>
   </div>
 </div>
@@ -437,497 +464,557 @@ tr:hover td{background:rgba(181,97,74,.03)}
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════
-//  CONFIG
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
+//  CONFIG & STATE
+// ════════════════════════════════════════════
 const API = window.location.origin + '/api';
-let TOKEN = localStorage.getItem('kv_admin_token') || '';
-let allSessions = [], currentSessionId = null, chatPollTimer = null;
+let TOKEN = localStorage.getItem('kv_adm') || '';
+let allProds = [], allOrders = [], allSess = [], curSid = null;
+let photoData = '';  // base64 or URL for current product being edited
 
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
 //  AUTH
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
 async function doLogin() {
-  const pass = document.getElementById('loginPass').value;
-  const err  = document.getElementById('loginErr');
+  const pass = document.getElementById('lp').value.trim();
+  const err  = document.getElementById('lerr');
   err.classList.remove('on');
+  if (!pass) { err.textContent = 'Введіть пароль'; err.classList.add('on'); return; }
   try {
     const r = await fetch(API + '/admin/login', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pass })
+      body: JSON.stringify({ password: pass }),
     });
     const d = await r.json();
-    if (d.ok) {
-      TOKEN = d.token;
-      localStorage.setItem('kv_admin_token', TOKEN);
-      initApp();
-    } else {
-      err.classList.add('on');
-    }
+    if (d.ok) { TOKEN = d.token; localStorage.setItem('kv_adm', TOKEN); startApp(); }
+    else { err.textContent = 'Невірний пароль'; err.classList.add('on'); }
   } catch {
-    err.textContent = 'Немає зв\'язку з сервером';
+    err.textContent = 'Немає зв\'язку з сервером. Перевірте підключення.';
     err.classList.add('on');
   }
 }
+document.getElementById('lp').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 function logout() {
-  TOKEN = '';
-  localStorage.removeItem('kv_admin_token');
+  TOKEN = ''; localStorage.removeItem('kv_adm');
   document.getElementById('app').classList.remove('on');
   document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('lp').value = '';
 }
 
-// ══════════════════════════════════════════════
+// Auto-login if token saved
+if (TOKEN) {
+  apiFetch('GET', '/admin/stats').then(d => { if (d.ok) startApp(); else logout(); }).catch(() => {});
+}
+
+// ════════════════════════════════════════════
 //  INIT
-// ══════════════════════════════════════════════
-function initApp() {
+// ════════════════════════════════════════════
+function startApp() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('app').classList.add('on');
-  loadDashboard();
-  startChatPoll();
+  loadDash();
+  setInterval(pollBadges, 10000);
 }
 
-// Check if already logged in
-if (TOKEN) {
-  fetch(API + '/admin/stats', { headers: { 'x-admin-token': TOKEN } })
-    .then(r => r.ok ? initApp() : null)
-    .catch(() => null);
-}
-
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
 //  NAVIGATION
-// ══════════════════════════════════════════════
-const PAGE_TITLES = { dashboard:'Дашборд', products:'Товари', orders:'Замовлення', chat:'Повідомлення', settings:'Налаштування' };
-
-function goTo(page) {
+// ════════════════════════════════════════════
+const TITLES = { dashboard:'Дашборд', products:'Товари', orders:'Замовлення', chat:'Повідомлення', settings:'Налаштування' };
+function go(page) {
+  closeSidebar();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.sb-link').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('on');
-  document.querySelector(`.sb-link[onclick*="${page}"]`).classList.add('active');
-  document.getElementById('pageTitle').textContent = PAGE_TITLES[page];
-  if (page === 'products') loadProducts();
-  if (page === 'orders')   loadOrders();
-  if (page === 'chat')     loadChats();
-  if (page === 'settings') loadSettings();
-  if (page === 'dashboard') loadDashboard();
+  document.querySelector(`.sb-btn[data-page="${page}"]`).classList.add('active');
+  document.getElementById('ptitle').textContent = TITLES[page] || page;
+  const loaders = { products: loadProds, orders: loadOrders, chat: loadChats, settings: loadSett, dashboard: loadDash };
+  if (loaders[page]) loaders[page]();
 }
 
-// ══════════════════════════════════════════════
-//  API HELPERS
-// ══════════════════════════════════════════════
-async function api(method, endpoint, body) {
-  const opts = {
-    method, headers: { 'x-admin-token': TOKEN, 'Content-Type': 'application/json' }
-  };
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sbOverlay').classList.toggle('on');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('on');
+}
+
+// ════════════════════════════════════════════
+//  API WRAPPER
+// ════════════════════════════════════════════
+async function apiFetch(method, endpoint, body) {
+  const opts = { method, headers: { 'x-admin-token': TOKEN, 'Content-Type': 'application/json' } };
   if (body) opts.body = JSON.stringify(body);
-  const r = await fetch(API + endpoint, opts);
-  return r.json();
+  try {
+    const r = await fetch(API + endpoint, opts);
+    return await r.json();
+  } catch { return { ok: false, error: 'network' }; }
 }
 
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
 //  DASHBOARD
-// ══════════════════════════════════════════════
-async function loadDashboard() {
-  const d = await api('GET', '/admin/stats');
-  if (!d.ok) return;
-  const s = d.stats;
-  document.getElementById('st-products').textContent = s.products;
-  document.getElementById('st-orders').textContent   = s.orders;
-  document.getElementById('st-revenue').textContent  = s.revenue ? s.revenue.toLocaleString('uk-UA') + ' ₴' : '0 ₴';
-  document.getElementById('st-chats').textContent    = s.sessions;
-
+// ════════════════════════════════════════════
+async function loadDash() {
+  const [sd, od, cd] = await Promise.all([
+    apiFetch('GET', '/admin/stats'),
+    apiFetch('GET', '/admin/orders'),
+    apiFetch('GET', '/admin/sessions'),
+  ]);
+  if (sd.ok) {
+    const s = sd.stats;
+    document.getElementById('st-p').textContent = s.products;
+    document.getElementById('st-o').textContent = s.orders;
+    document.getElementById('st-r').textContent = s.revenue ? s.revenue.toLocaleString('uk-UA') + ' ₴' : '0 ₴';
+    document.getElementById('st-c').textContent = s.sessions;
+  }
   // Recent orders
-  const od = await api('GET', '/admin/orders');
-  const recent = (od.orders || []).slice(0, 5);
-  const rTable = document.getElementById('recentOrdersTable');
-  if (recent.length) {
-    rTable.innerHTML = `<table><thead><tr><th>Номер</th><th>Клієнт</th><th>Сума</th><th>Статус</th></tr></thead><tbody>
-      ${recent.map(o => `<tr>
-        <td><b>${o.id}</b></td>
-        <td>${esc(o.clientName || '—')}</td>
-        <td style="color:var(--primary);font-weight:600">${(o.total||0).toLocaleString('uk-UA')} ₴</td>
-        <td><span class="badge badge-${o.status}">${statusLabel(o.status)}</span></td>
-      </tr>`).join('')}
-    </tbody></table>`;
-  } else {
-    rTable.innerHTML = '<div class="empty-state"><span class="ic">📦</span>Замовлень поки немає</div>';
-  }
-
+  const ro = (od.orders || []).slice(0, 5);
+  const doEl = document.getElementById('dash-orders');
+  doEl.innerHTML = ro.length
+    ? `<table><thead><tr><th>Номер</th><th>Клієнт</th><th>Сума</th><th>Статус</th></tr></thead><tbody>
+       ${ro.map(o => `<tr>
+         <td><b>${e(o.id)}</b></td>
+         <td>${e(o.clientName||'—')}</td>
+         <td style="color:var(--primary);font-weight:600">${(o.total||0).toLocaleString('uk-UA')} ₴</td>
+         <td><span class="badge ${sBadge(o.status)}">${sLabel(o.status)}</span></td>
+       </tr>`).join('')}
+       </tbody></table>`
+    : '<div class="empty"><span class="ic">📦</span>Замовлень поки немає</div>';
   // Recent chats
-  const cd = await api('GET', '/admin/sessions');
-  const recentChats = (cd.sessions || []).slice(0, 4);
-  const rc = document.getElementById('recentChats');
-  if (recentChats.length) {
-    rc.innerHTML = recentChats.map(s => `
-      <div class="chat-item" onclick="goTo('chat');setTimeout(()=>openSession('${s.id}'),300)" style="border-radius:10px">
-        <div class="ci-meta"><span class="ci-name">${esc(s.name)}</span><span class="ci-time">${timeAgo(s.lastTime)}</span></div>
-        <div class="ci-preview">${esc(s.lastText)}</div>
-      </div>`).join('');
-  } else {
-    rc.innerHTML = '<div class="empty-state"><span class="ic">💬</span>Повідомлень немає</div>';
-  }
+  const rc = (cd.sessions || []).slice(0, 5);
+  const dcEl = document.getElementById('dash-chats');
+  dcEl.innerHTML = rc.length
+    ? rc.map(s => `<div class="cs-item" onclick="go('chat');setTimeout(()=>openSess('${s.id}'),350)" style="border-radius:8px">
+        <div class="cs-meta"><span class="cs-name">${e(s.name)}</span><span class="cs-time">${ago(s.lastTime)}</span></div>
+        <div class="cs-prev">${e(s.lastText)}</div>
+      </div>`).join('')
+    : '<div class="empty"><span class="ic">💬</span>Немає</div>';
 }
 
-// ══════════════════════════════════════════════
+async function pollBadges() {
+  const [od, cd] = await Promise.all([apiFetch('GET','/admin/orders'), apiFetch('GET','/admin/sessions')]);
+  const newOrd = (od.orders||[]).filter(o => o.status==='processing').length;
+  const newMsg = (cd.sessions||[]).reduce((s,x) => s + x.unread, 0);
+  setNb('nbOrders', newOrd);
+  setNb('nbChat', newMsg);
+}
+function setNb(id, n) {
+  const el = document.getElementById(id);
+  el.textContent = n; el.style.display = n > 0 ? 'inline-flex' : 'none';
+}
+
+// ════════════════════════════════════════════
 //  PRODUCTS
-// ══════════════════════════════════════════════
-let allProducts = [];
-
-async function loadProducts() {
-  const d = await api('GET', '/admin/products');
-  allProducts = d.products || [];
-  renderProducts();
+// ════════════════════════════════════════════
+async function loadProds() {
+  const d = await apiFetch('GET', '/admin/products');
+  allProds = d.products || [];
+  renderProds();
 }
 
-function renderProducts() {
-  const q    = document.getElementById('prodSearch').value.toLowerCase();
-  const cat  = document.getElementById('prodCatFilter').value;
-  const grid = document.getElementById('productsGrid');
-  let list   = allProducts;
-  if (q)   list = list.filter(p => p.name.toLowerCase().includes(q) || p.origin?.toLowerCase().includes(q));
+function renderProds() {
+  const q   = (document.getElementById('ps').value || '').toLowerCase();
+  const cat = document.getElementById('pc').value;
+  let list  = allProds;
+  if (q)   list = list.filter(p => (p.name||'').toLowerCase().includes(q) || (p.origin||'').toLowerCase().includes(q));
   if (cat) list = list.filter(p => p.cat === cat);
-
-  const addCard = `<div class="add-prod-card" onclick="openAddProduct()"><div class="plus">+</div><span>Додати товар</span></div>`;
-  if (!list.length) { grid.innerHTML = addCard; return; }
-
-  grid.innerHTML = addCard + list.map(p => `
-    <div class="prod-adm-card">
-      <div class="pac-img">
-        <img src="${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Фото'"/>
-        ${p.badge ? `<span class="pac-bdg" style="background:${bdgColor(p.bt)};color:#fff">${esc(p.badge)}</span>` : ''}
+  const grid = document.getElementById('prodsGrid');
+  const addC = `<div class="add-card" onclick="openAdd()"><div class="add-card-plus">+</div><span style="font-size:.8rem;font-weight:500">Додати товар</span></div>`;
+  if (!list.length) { grid.innerHTML = addC; return; }
+  grid.innerHTML = addC + list.map(p => `
+    <div class="pc">
+      <div class="pc-img">
+        <img src="${e(p.photo)}" alt="${e(p.name)}" loading="lazy" onerror="this.style.display='none'"/>
+        ${p.badge ? `<span class="pc-bdg" style="background:${bdgCol(p.bt)};color:#fff">${e(p.badge)}</span>` : ''}
       </div>
-      <div class="pac-body">
-        <div class="pac-name">${esc(p.name)}</div>
-        <div class="pac-cat">${esc(p.cat)} · ${esc(p.origin||'')}</div>
-        <div class="pac-price">${p.oldPrice ? `<span style="text-decoration:line-through;color:var(--muted);font-size:.8rem;font-weight:400;margin-right:.3rem">${p.oldPrice} ₴</span>` : ''}${p.price} ₴</div>
-        <div class="pac-actions">
-          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="openEditProduct(${p.id})">✏️ Редагувати</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id},'${esc(p.name)}')">🗑</button>
+      <div class="pc-body">
+        <div class="pc-name">${e(p.name)}</div>
+        <div class="pc-cat">${e(p.cat)} · ${e(p.origin||'')}</div>
+        <div class="pc-price">
+          ${p.oldPrice ? `<span style="text-decoration:line-through;color:var(--muted);font-size:.78rem;font-weight:400;margin-right:.25rem">${p.oldPrice} ₴</span>` : ''}
+          ${p.price} ₴
+        </div>
+        <div class="pc-actions">
+          <button class="btn btn-ghost" style="font-size:.72rem" onclick="openEdit(${p.id})">✏️ Ред.</button>
+          <button class="btn btn-danger btn-sm" onclick="delProd(${p.id},'${e(p.name).replace(/'/g,'')}')">🗑</button>
         </div>
       </div>
     </div>`).join('');
 }
 
-function openAddProduct() {
-  document.getElementById('productModalTitle').textContent = 'Додати товар';
-  document.getElementById('pmId').value = '';
-  ['pmName','pmOrigin','pmBadge','pmPhoto'].forEach(id => document.getElementById(id).value = '');
+function openAdd() {
+  document.getElementById('pmTitle').textContent = 'Додати товар';
+  document.getElementById('pmId').value    = '';
+  document.getElementById('pmName').value  = '';
+  document.getElementById('pmCat').value   = 'Троянди';
+  document.getElementById('pmOrig').value  = '';
   document.getElementById('pmPrice').value = '';
-  document.getElementById('pmOldPrice').value = '';
-  document.getElementById('pmBig').value = 'false';
-  document.getElementById('pmCat').value = 'Троянди';
-  document.getElementById('pmPreview').classList.remove('on');
-  document.getElementById('productModal').classList.add('on');
+  document.getElementById('pmOld').value   = '';
+  document.getElementById('pmBadge').value = '';
+  document.getElementById('pmBig').value   = 'false';
+  clearPhoto();
+  setPhotoTab('file');
+  document.getElementById('pmModal').classList.add('on');
 }
 
-function openEditProduct(id) {
-  const p = allProducts.find(x => x.id === id);
+function openEdit(id) {
+  const p = allProds.find(x => String(x.id) === String(id));
   if (!p) return;
-  document.getElementById('productModalTitle').textContent = 'Редагувати товар';
-  document.getElementById('pmId').value       = p.id;
-  document.getElementById('pmName').value     = p.name;
-  document.getElementById('pmCat').value      = p.cat;
-  document.getElementById('pmOrigin').value   = p.origin || '';
-  document.getElementById('pmPrice').value    = p.price;
-  document.getElementById('pmOldPrice').value = p.oldPrice || '';
-  document.getElementById('pmBadge').value    = p.badge || '';
-  document.getElementById('pmBig').value      = p.big ? 'true' : 'false';
-  document.getElementById('pmPhoto').value    = p.photo || '';
-  const prev = document.getElementById('pmPreview');
-  if (p.photo) { prev.src = p.photo; prev.classList.add('on'); }
-  else { prev.classList.remove('on'); }
-  document.getElementById('productModal').classList.add('on');
+  document.getElementById('pmTitle').textContent = 'Редагувати товар';
+  document.getElementById('pmId').value    = p.id;
+  document.getElementById('pmName').value  = p.name || '';
+  document.getElementById('pmCat').value   = p.cat || 'Троянди';
+  document.getElementById('pmOrig').value  = p.origin || '';
+  document.getElementById('pmPrice').value = p.price || '';
+  document.getElementById('pmOld').value   = p.oldPrice || '';
+  document.getElementById('pmBadge').value = p.badge || '';
+  document.getElementById('pmBig').value   = p.big ? 'true' : 'false';
+  // Set photo
+  photoData = p.photo || '';
+  if (photoData) {
+    document.getElementById('pvImg').src = photoData;
+    document.getElementById('pvWrap').classList.add('on');
+    setPhotoTab('url');
+    document.getElementById('pmUrl').value = photoData.startsWith('data:') ? '' : photoData;
+  } else {
+    clearPhoto();
+    setPhotoTab('file');
+  }
+  document.getElementById('pmModal').classList.add('on');
 }
 
-function closeProductModal() { document.getElementById('productModal').classList.remove('on'); }
-
-function previewPhoto() {
-  const url  = document.getElementById('pmPhoto').value;
-  const prev = document.getElementById('pmPreview');
-  if (url) { prev.src = url; prev.classList.add('on'); }
-  else { prev.classList.remove('on'); }
-}
+function closePM() { document.getElementById('pmModal').classList.remove('on'); }
 
 async function saveProduct() {
-  const id = document.getElementById('pmId').value;
+  const id    = document.getElementById('pmId').value;
+  const name  = document.getElementById('pmName').value.trim();
+  const price = parseFloat(document.getElementById('pmPrice').value);
+  if (!name)     { showToast('Введіть назву товару', 'e'); return; }
+  if (!price)    { showToast('Введіть ціну', 'e'); return; }
+  if (!photoData){ showToast('Додайте фотографію', 'e'); return; }
+
   const data = {
-    name:     document.getElementById('pmName').value.trim(),
+    name, price,
     cat:      document.getElementById('pmCat').value,
-    origin:   document.getElementById('pmOrigin').value.trim(),
-    price:    parseFloat(document.getElementById('pmPrice').value) || 0,
-    oldPrice: parseFloat(document.getElementById('pmOldPrice').value) || null,
+    origin:   document.getElementById('pmOrig').value.trim(),
+    oldPrice: parseFloat(document.getElementById('pmOld').value) || null,
     badge:    document.getElementById('pmBadge').value.trim(),
     big:      document.getElementById('pmBig').value === 'true',
-    photo:    document.getElementById('pmPhoto').value.trim(),
+    photo:    photoData,
   };
-  if (!data.name || !data.price || !data.photo) { showToast('Заповніть назву, ціну та фото', 'error'); return; }
   if (!data.oldPrice) delete data.oldPrice;
 
+  const btn = document.getElementById('pmSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ Збереження…';
+
   const d = id
-    ? await api('PUT', `/admin/products/${id}`, data)
-    : await api('POST', '/admin/products', data);
+    ? await apiFetch('PUT', `/admin/products/${id}`, data)
+    : await apiFetch('POST', '/admin/products', data);
+
+  btn.disabled = false; btn.textContent = '💾 Зберегти';
 
   if (d.ok) {
-    closeProductModal();
-    await loadProducts();
-    showToast(id ? '✅ Товар оновлено!' : '✅ Товар додано!', 'success');
+    closePM(); await loadProds();
+    showToast(id ? '✅ Товар оновлено!' : '✅ Товар додано!', 's');
   } else {
-    showToast('Помилка збереження', 'error');
+    showToast('Помилка: ' + (d.error || 'невідома'), 'e');
   }
 }
 
-function deleteProduct(id, name) {
-  showConfirm(`Видалити товар «${name}»? Це незворотньо.`, async () => {
-    const d = await api('DELETE', `/admin/products/${id}`);
-    if (d.ok) { await loadProducts(); showToast('🗑 Товар видалено', 'success'); }
+function delProd(id, name) {
+  showConf(`Видалити товар «${name}»? Цю дію не можна скасувати.`, async () => {
+    const d = await apiFetch('DELETE', `/admin/products/${id}`);
+    if (d.ok) { await loadProds(); showToast('🗑 Товар видалено', 's'); }
+    else showToast('Помилка видалення', 'e');
   });
 }
 
-// ══════════════════════════════════════════════
-//  ORDERS
-// ══════════════════════════════════════════════
-let allOrders = [];
+// ════════════════════════════════════════════
+//  PHOTO UPLOAD
+// ════════════════════════════════════════════
+function setPhotoTab(tab) {
+  document.getElementById('fileZone').style.display = tab === 'file' ? 'block' : 'none';
+  document.getElementById('urlZone').style.display  = tab === 'url'  ? 'block' : 'none';
+  document.getElementById('ptFile').classList.toggle('active', tab === 'file');
+  document.getElementById('ptUrl').classList.toggle('active',  tab === 'url');
+}
 
+function clearPhoto() {
+  photoData = '';
+  document.getElementById('pvWrap').classList.remove('on');
+  document.getElementById('pvImg').src = '';
+  document.getElementById('uzText').innerHTML = '<strong>Натисніть</strong> або перетягніть фото сюди<br><small style="color:var(--muted2)">JPG, PNG, WEBP до 10 МБ</small>';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('pmUrl').value = '';
+  document.getElementById('upProgress').classList.remove('on');
+}
+
+function setPreview(src) {
+  photoData = src;
+  document.getElementById('pvImg').src = src;
+  document.getElementById('pvWrap').classList.add('on');
+}
+
+async function handleFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { showToast('Файл занадто великий (макс. 10 МБ)', 'e'); return; }
+  document.getElementById('upProgress').classList.add('on');
+  document.getElementById('upProgress').textContent = '⏳ Обробка зображення…';
+  try {
+    const b64 = await resizeEncode(file);
+    setPreview(b64);
+    document.getElementById('uzText').innerHTML = `✅ <strong>${file.name}</strong>`;
+    document.getElementById('upProgress').textContent = '✅ Готово!';
+    setTimeout(() => document.getElementById('upProgress').classList.remove('on'), 1500);
+  } catch {
+    showToast('Помилка обробки зображення', 'e');
+    document.getElementById('upProgress').classList.remove('on');
+  }
+}
+
+function onUrlInput() {
+  const url = document.getElementById('pmUrl').value.trim();
+  if (url) setPreview(url);
+  else clearPhoto();
+}
+
+function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag'); }
+function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer(); dt.items.add(file);
+    document.getElementById('fileInput').files = dt.files;
+    handleFile({ target: { files: [file] } });
+  }
+}
+
+async function resizeEncode(file, maxW = 900, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('load failed')); };
+    img.src = url;
+  });
+}
+
+// ════════════════════════════════════════════
+//  ORDERS
+// ════════════════════════════════════════════
 async function loadOrders() {
-  const d = await api('GET', '/admin/orders');
+  const d = await apiFetch('GET', '/admin/orders');
   allOrders = d.orders || [];
   renderOrders();
 }
 
 function renderOrders() {
-  const filter = document.getElementById('orderStatusFilter').value;
-  let list = allOrders;
-  if (filter) list = list.filter(o => o.status === filter);
-  const tbody = document.getElementById('ordersBody');
-  const empty = document.getElementById('ordersEmpty');
-  if (!list.length) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  const f = document.getElementById('osf').value;
+  let list = f ? allOrders.filter(o => o.status === f) : allOrders;
+  const tbody = document.getElementById('otbody');
+  const empty = document.getElementById('oempty');
+  if (!list.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
   tbody.innerHTML = list.map(o => `
     <tr>
-      <td><b>${esc(o.id)}</b></td>
+      <td><b>${e(o.id)}</b></td>
+      <td>${e(o.clientName||'—')}</td>
+      <td>${e(o.phone||'—')}</td>
+      <td style="font-weight:700;color:var(--primary)">${(o.total||0).toLocaleString('uk-UA')} ₴</td>
+      <td style="font-size:.75rem;color:var(--muted)">${o.date||fmtDate(o.createdAt)}</td>
       <td>
-        <div style="font-weight:500">${esc(o.clientName || 'Анонім')}</div>
-        <div style="font-size:.72rem;color:var(--muted)">${esc(o.phone || '')}</div>
-      </td>
-      <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(o.items || '—')}</td>
-      <td style="font-weight:600;color:var(--primary)">${(o.total||0).toLocaleString('uk-UA')} ₴</td>
-      <td style="font-size:.76rem;color:var(--muted)">${o.date || fmtDate(o.createdAt)}</td>
-      <td>
-        <select onchange="updateOrderStatus('${o.id}',this.value)" style="border:1.5px solid var(--border);border-radius:6px;padding:.28rem .5rem;font-size:.75rem;font-family:inherit;cursor:pointer;outline:none">
+        <select onchange="updOrder('${o.id}',this.value)"
+          style="border:1.5px solid var(--border);border-radius:6px;padding:.28rem .5rem;font-size:.75rem;font-family:inherit;cursor:pointer;outline:none;min-height:32px">
           <option value="processing" ${o.status==='processing'?'selected':''}>В обробці</option>
-          <option value="delivered"  ${o.status==='delivered'?'selected':''}>Доставлено</option>
-          <option value="cancelled"  ${o.status==='cancelled'?'selected':''}>Скасовано</option>
+          <option value="delivered"  ${o.status==='delivered' ?'selected':''}>Доставлено</option>
+          <option value="cancelled"  ${o.status==='cancelled' ?'selected':''}>Скасовано</option>
         </select>
       </td>
-      <td><div class="td-actions">
-        <button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">🗑</button>
-      </div></td>
+      <td><button class="btn btn-danger btn-sm" onclick="delOrder('${o.id}')">🗑</button></td>
     </tr>`).join('');
 }
 
-async function updateOrderStatus(id, status) {
-  await api('PUT', `/admin/orders/${id}`, { status });
-  showToast('✅ Статус оновлено', 'success');
+async function updOrder(id, status) {
+  await apiFetch('PUT', `/admin/orders/${id}`, { status });
   await loadOrders();
+  showToast('✅ Статус оновлено', 's');
 }
 
-function deleteOrder(id) {
-  showConfirm('Видалити це замовлення?', async () => {
-    await api('DELETE', `/admin/orders/${id}`);
+function delOrder(id) {
+  showConf('Видалити це замовлення?', async () => {
+    await apiFetch('DELETE', `/admin/orders/${id}`);
     await loadOrders();
-    showToast('🗑 Замовлення видалено', 'success');
+    showToast('🗑 Замовлення видалено', 's');
   });
 }
 
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
 //  CHAT
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
 async function loadChats() {
-  const d = await api('GET', '/admin/sessions');
-  allSessions = d.sessions || [];
-  renderChatList();
-  updateChatBadge();
+  const d = await apiFetch('GET', '/admin/sessions');
+  allSess = d.sessions || [];
+  renderSessions();
+  if (curSid) openSess(curSid);
 }
 
-function renderChatList() {
-  const q = document.getElementById('chatSearch')?.value?.toLowerCase() || '';
-  const list = allSessions.filter(s => !q || s.name.toLowerCase().includes(q) || s.lastText.toLowerCase().includes(q));
-  const el = document.getElementById('chatSessionList');
-  if (!list.length) { el.innerHTML = '<div class="empty-state"><span class="ic">💬</span>Немає чатів</div>'; return; }
+function renderSessions() {
+  const q = (document.getElementById('csq').value || '').toLowerCase();
+  const list = q ? allSess.filter(s => s.name.toLowerCase().includes(q) || s.lastText.toLowerCase().includes(q)) : allSess;
+  const el = document.getElementById('csList');
+  if (!list.length) { el.innerHTML = '<div class="empty"><span class="ic">💬</span>Немає чатів</div>'; return; }
   el.innerHTML = list.map(s => `
-    <div class="chat-item ${s.id === currentSessionId ? 'active' : ''}" onclick="openSession('${s.id}')">
-      <div class="ci-meta">
-        <span class="ci-name">${esc(s.name)}</span>
-        ${s.unread ? `<span class="ci-cnt">${s.unread}</span>` : ''}
-        <span class="ci-time">${timeAgo(s.lastTime)}</span>
+    <div class="cs-item${s.id===curSid?' active':''}" onclick="openSess('${s.id}')">
+      <div class="cs-meta">
+        <span class="cs-name">${e(s.name)}</span>
+        ${s.unread ? `<span class="cs-cnt">${s.unread}</span>` : ''}
+        <span class="cs-time">${ago(s.lastTime)}</span>
       </div>
-      <div class="ci-preview">${esc(s.lastText)}</div>
+      <div class="cs-prev">${e(s.lastText)}</div>
     </div>`).join('');
 }
 
-function filterChats() { renderChatList(); }
-
-function openSession(id) {
-  currentSessionId = id;
-  const s = allSessions.find(x => x.id === id);
+function openSess(id) {
+  curSid = id;
+  const s = allSess.find(x => x.id === id);
   if (!s) return;
-  renderChatList();
+  renderSessions();
+  const msgs = [
+    ...s.msgs.map(m => ({ text: m.text, time: m.time, side: 'cl' })),
+    ...s.replies.map(r => ({ text: r.text, time: r.time, side: 'ad' })),
+  ].sort((a,b) => a.time - b.time);
 
-  // Build all messages (client msgs + admin replies merged by time)
-  const allMsgs = [
-    ...s.msgs.map(m => ({ ...m, side: 'client' })),
-    ...s.replies.map(r => ({ text: r.text, time: r.time, side: 'admin' })),
-  ].sort((a, b) => a.time - b.time);
-
-  document.getElementById('chatMain').innerHTML = `
-    <div class="chat-hd">
-      <div class="chat-hd-av">👤</div>
-      <div>
-        <div class="chat-hd-name">${esc(s.name)}</div>
-        <div class="chat-hd-sid">ID: ${s.id}</div>
-      </div>
+  document.getElementById('chatWin').innerHTML = `
+    <div class="cw-hd">
+      <div class="cw-av">👤</div>
+      <div><div class="cw-name">${e(s.name)}</div><div class="cw-sid">ID: ${s.id}</div></div>
     </div>
-    <div class="chat-messages" id="chatMsgsArea">
-      ${allMsgs.map(m => `
+    <div class="chat-msgs" id="cmsgs">
+      ${msgs.map(m => `
         <div class="cmsg ${m.side}">
-          <div class="cmsg-b">${esc(m.text)}</div>
+          <div class="cmsg-b">${e(m.text)}</div>
           <div class="cmsg-t">${fmtTime(m.time)}</div>
         </div>`).join('')}
     </div>
-    <div class="chat-input-area">
-      <textarea class="chat-ta" id="adminReplyTa" placeholder="Написати відповідь…" rows="1"></textarea>
-      <button class="chat-send-btn" onclick="sendAdminReply()">➤</button>
+    <div class="chat-ia">
+      <textarea class="chat-ta" id="rta" placeholder="Написати відповідь…" rows="1"></textarea>
+      <button class="chat-sb" onclick="sendReply()">➤</button>
     </div>`;
 
-  const area = document.getElementById('chatMsgsArea');
-  if (area) area.scrollTop = area.scrollHeight;
+  const msgsEl = document.getElementById('cmsgs');
+  if (msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight;
 
-  // Enter to send
-  document.getElementById('adminReplyTa').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAdminReply(); }
-  });
+  const ta = document.getElementById('rta');
+  if (ta) {
+    ta.addEventListener('keydown', e => { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendReply();} });
+    ta.addEventListener('input', () => { ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,110)+'px'; });
+  }
 }
 
-async function sendAdminReply() {
-  const ta   = document.getElementById('adminReplyTa');
+async function sendReply() {
+  const ta = document.getElementById('rta');
   const text = ta?.value?.trim();
-  if (!text || !currentSessionId) return;
-  ta.value = '';
-  const d = await api('POST', '/admin/reply', { sessionId: currentSessionId, text });
-  if (d.ok) { await loadChats(); openSession(currentSessionId); }
+  if (!text || !curSid) return;
+  ta.value = ''; ta.style.height = 'auto';
+  const d = await apiFetch('POST', '/admin/reply', { sessionId: curSid, text });
+  if (d.ok) { await loadChats(); }
+  else showToast('Помилка відправки', 'e');
 }
 
-function startChatPoll() {
-  chatPollTimer = setInterval(async () => {
-    const d = await api('GET', '/admin/sessions');
-    allSessions = d.sessions || [];
-    updateChatBadge();
-    if (currentSessionId) renderChatList();
-  }, 8000);
-}
-
-function updateChatBadge() {
-  const cnt = allSessions.reduce((s, x) => s + x.unread, 0);
-  const el  = document.getElementById('chatBadge');
-  el.textContent = cnt;
-  el.style.display = cnt > 0 ? 'inline-flex' : 'none';
-}
-
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
 //  SETTINGS
-// ══════════════════════════════════════════════
-const SETTINGS_FIELDS = [
-  { key:'siteName',   label:'Назва сайту',       group:'Бренд' },
-  { key:'heroTitle',  label:'Заголовок (Hero)',   group:'Бренд' },
-  { key:'heroSub',    label:'Підзаголовок (Hero)',group:'Бренд' },
-  { key:'promoTitle', label:'Заголовок акції',    group:'Акція' },
-  { key:'promoDesc',  label:'Опис акції',         group:'Акція' },
-  { key:'phone',      label:'Телефон',            group:'Контакти' },
-  { key:'email',      label:'Email',              group:'Контакти' },
-  { key:'address',    label:'Адреса',             group:'Контакти' },
-  { key:'hours',      label:'Графік роботи',      group:'Контакти' },
-  { key:'instagram',  label:'Instagram посилання',group:'Соцмережі' },
-  { key:'telegram',   label:'Telegram посилання', group:'Соцмережі' },
+// ════════════════════════════════════════════
+const SFIELDS = [
+  { k:'siteName',   l:'Назва сайту',        g:'Бренд' },
+  { k:'heroTitle',  l:'Заголовок (Hero)',    g:'Бренд' },
+  { k:'heroSub',    l:'Підзаголовок (Hero)', g:'Бренд' },
+  { k:'promoTitle', l:'Заголовок акції',     g:'Акція' },
+  { k:'promoDesc',  l:'Опис акції',          g:'Акція' },
+  { k:'phone',      l:'Телефон',             g:'Контакти' },
+  { k:'email',      l:'Email',               g:'Контакти' },
+  { k:'address',    l:'Адреса',              g:'Контакти' },
+  { k:'hours',      l:'Графік роботи',       g:'Контакти' },
+  { k:'instagram',  l:'Instagram',           g:'Соцмережі' },
+  { k:'telegram',   l:'Telegram',            g:'Соцмережі' },
 ];
 
-async function loadSettings() {
-  const d = await api('GET', '/admin/settings');
+async function loadSett() {
+  const d = await apiFetch('GET', '/admin/settings');
   const s = d.settings || {};
   const groups = {};
-  SETTINGS_FIELDS.forEach(f => {
-    if (!groups[f.group]) groups[f.group] = [];
-    groups[f.group].push(f);
-  });
-  document.getElementById('settingsGrid').innerHTML = Object.entries(groups).map(([grp, fields]) => `
-    <div class="settings-card">
-      <h3>${grp}</h3>
-      ${fields.map(f => `
-        <div class="field">
-          <label>${f.label}</label>
-          <input type="text" id="set-${f.key}" value="${esc(s[f.key] || '')}" placeholder="${f.label}"/>
-        </div>`).join('')}
+  SFIELDS.forEach(f => { if (!groups[f.g]) groups[f.g]=[]; groups[f.g].push(f); });
+  document.getElementById('sgrid').innerHTML = Object.entries(groups).map(([g,fs]) => `
+    <div class="scard">
+      <h3>${g}</h3>
+      ${fs.map(f => `<div class="field">
+        <label>${f.l}</label>
+        <input id="sf-${f.k}" value="${e(s[f.k]||'')}" placeholder="${f.l}"/>
+      </div>`).join('')}
     </div>`).join('');
 }
 
-async function saveSettings() {
+async function saveSett() {
   const body = {};
-  SETTINGS_FIELDS.forEach(f => {
-    const el = document.getElementById('set-' + f.key);
-    if (el) body[f.key] = el.value.trim();
-  });
-  const d = await api('PUT', '/admin/settings', body);
-  if (d.ok) showToast('✅ Налаштування збережено!', 'success');
-  else showToast('Помилка збереження', 'error');
+  SFIELDS.forEach(f => { const el = document.getElementById('sf-' + f.k); if (el) body[f.k] = el.value.trim(); });
+  const d = await apiFetch('PUT', '/admin/settings', body);
+  if (d.ok) showToast('✅ Налаштування збережено!', 's');
+  else showToast('Помилка збереження', 'e');
 }
 
-// ══════════════════════════════════════════════
-//  CONFIRM MODAL
-// ══════════════════════════════════════════════
-let confirmCb = null;
-function showConfirm(text, cb) {
-  confirmCb = cb;
-  document.getElementById('confirmText').textContent = text;
-  document.getElementById('confirmModal').classList.add('on');
-  document.getElementById('confirmOkBtn').onclick = () => { closeConfirm(); cb && cb(); };
+// ════════════════════════════════════════════
+//  CONFIRM
+// ════════════════════════════════════════════
+function showConf(text, cb) {
+  document.getElementById('confText').textContent = text;
+  document.getElementById('confOk').onclick = () => { closeConf(); cb && cb(); };
+  document.getElementById('confModal').classList.add('on');
 }
-function closeConfirm() { document.getElementById('confirmModal').classList.remove('on'); }
+function closeConf() { document.getElementById('confModal').classList.remove('on'); }
 
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
 //  TOAST
-// ══════════════════════════════════════════════
-let toastTimer;
-function showToast(msg, type = '') {
+// ════════════════════════════════════════════
+let tTimer;
+function showToast(msg, type = 'i') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast on' + (type ? ' ' + type : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('on'), 2800);
+  t.textContent = msg; t.className = `toast on ${type}`;
+  clearTimeout(tTimer); tTimer = setTimeout(() => t.classList.remove('on'), 3000);
 }
 
-// ══════════════════════════════════════════════
+// ════════════════════════════════════════════
 //  HELPERS
-// ══════════════════════════════════════════════
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function statusLabel(s) { return { processing:'В обробці', delivered:'Доставлено', cancelled:'Скасовано' }[s] || s; }
-function bdgColor(bt) { return { 'bdg-hit':'#c9956a', 'bdg-new':'#7a9e7e', 'bdg-sale':'#e07070' }[bt] || '#999'; }
+// ════════════════════════════════════════════
+function e(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function sBadge(s) { return {processing:'b-proc',delivered:'b-deliv',cancelled:'b-canc'}[s]||''; }
+function sLabel(s)  { return {processing:'В обробці',delivered:'Доставлено',cancelled:'Скасовано'}[s]||s; }
+function bdgCol(bt) { return {bdg_hit:'#c9956a','bdg-hit':'#c9956a','bdg-new':'#7a9e7e','bdg-sale':'#d63031'}[bt]||'#999'; }
 function fmtDate(ts) { return ts ? new Date(ts).toLocaleDateString('uk-UA') : '—'; }
 function fmtTime(ts) { return ts ? new Date(ts).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}) : ''; }
-function timeAgo(ts) {
+function ago(ts) {
   if (!ts) return '';
-  const s = Math.floor((Date.now() - ts) / 1000);
-  if (s < 60)    return 'щойно';
-  if (s < 3600)  return Math.floor(s/60) + ' хв';
-  if (s < 86400) return Math.floor(s/3600) + ' год';
+  const s = Math.floor((Date.now()-ts)/1000);
+  if (s < 60) return 'щойно';
+  if (s < 3600) return Math.floor(s/60)+' хв';
+  if (s < 86400) return Math.floor(s/3600)+' год';
   return fmtDate(ts);
 }
 
-// Modal overlays close on backdrop click
-document.querySelectorAll('.modal-bg').forEach(bg =>
-  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('on'); })
+// Close modals on backdrop click
+document.querySelectorAll('.mbg').forEach(bg =>
+  bg.addEventListener('click', e => { if (e.target===bg) bg.classList.remove('on'); })
 );
 </script>
 </body>
