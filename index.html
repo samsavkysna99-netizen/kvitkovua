@@ -1119,7 +1119,7 @@ footer{background:var(--text);color:rgba(255,255,255,.75);padding:5rem 4rem 2rem
 /* ══════════════════════════════════
    DATA
 ══════════════════════════════════ */
-const PRODUCTS = [
+let PRODUCTS = [
   {id:1,name:'Ніжна Принцеса',origin:'Троянди · Еквадор',price:890,photo:'https://images.unsplash.com/photo-1562690868-60bbe7293e94?w=600&auto=format&fit=crop&q=80',cat:'Троянди',badge:'Хіт',bt:'bdg-hit',big:true},
   {id:2,name:'Місячний Піон',origin:'Піони · Нідерланди',price:1200,photo:'https://images.unsplash.com/photo-1557800636-894a64c1696f?w=600&auto=format&fit=crop&q=80',cat:'Піони',badge:'Новинка',bt:'bdg-new',big:false},
   {id:3,name:'Пурпурна Орхідея',origin:'Орхідеї · Таїланд',price:1650,photo:'https://images.unsplash.com/photo-1524598171353-7d7e46e1f7d1?w=600&auto=format&fit=crop&q=80',cat:'Орхідеї',badge:'',bt:'',big:false},
@@ -1388,6 +1388,18 @@ document.getElementById('closeCart').onclick=closeCart;
 /* Init */
 renderProducts('all');
 updateNavAuth();
+
+/* Load products from server (fallback to static above if server is down) */
+(async()=>{
+  try{
+    const ctrl=new AbortController();
+    const tid=setTimeout(()=>ctrl.abort(),6000);
+    const r=await fetch('https://kvitkovua-chat.onrender.com/api/products',{signal:ctrl.signal});
+    clearTimeout(tid);
+    const d=await r.json();
+    if(d.ok&&d.products&&d.products.length){PRODUCTS=d.products;renderProducts(activeFilter);}
+  }catch(_){}
+})();
 </script>
 </body>
 </html>

@@ -15,7 +15,8 @@
   --border:#e0d4c8;--shadow:0 2px 16px rgba(100,60,30,.1);--shadow-lg:0 8px 40px rgba(100,60,30,.18);
   --red:#d63031;--green:#00b894;--yellow:#fdcb6e;
 }
-html,body{height:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);background:var(--bg);overflow:hidden}
+html{height:100%;overflow:hidden}
+body{height:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);background:var(--bg);overflow:hidden;-webkit-overflow-scrolling:touch}
 
 /* ════ LOGIN ════ */
 #loginPage{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#2d1f14 0%,#5a3520 100%);overflow:auto;padding:1rem}
@@ -130,7 +131,7 @@ tr:hover td{background:rgba(181,97,74,.025)}
 .fbar input{min-width:180px;flex:1}
 
 /* ════ MODAL ════ */
-.mbg{position:fixed;inset:0;background:rgba(20,10,5,.5);z-index:500;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);padding:0}
+.mbg{position:fixed;inset:0;background:rgba(20,10,5,.5);z-index:500;display:none;align-items:flex-end;justify-content:center;padding:0}
 .mbg.on{display:flex}
 @media(min-width:600px){.mbg{align-items:center;padding:1rem}}
 .modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,.2);animation:mslide .3s ease;display:flex;flex-direction:column}
