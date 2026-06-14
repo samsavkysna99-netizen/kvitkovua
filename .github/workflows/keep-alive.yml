@@ -1,0 +1,19 @@
+name: Keep Render Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render server
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://kvitkovua-chat.onrender.com/ping)
+          echo "Render ping: HTTP $response"
+          if [ "$response" != "200" ]; then
+            echo "WARNING: server returned $response"
+            exit 1
+          fi
